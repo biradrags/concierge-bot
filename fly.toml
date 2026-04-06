@@ -1,0 +1,17 @@
+app = 'bali-concierge'
+primary_region = 'sin'
+
+[build]
+
+[env]
+  APP_ENV = 'production'
+
+[[restart]]
+  policy = 'always'
+  retries = 5
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '256mb'
+  cpu_kind = 'shared'
+  cpus = 1
