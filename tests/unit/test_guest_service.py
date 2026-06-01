@@ -39,7 +39,7 @@ async def test_get_or_create_new_guest(
 
     out = await guest_service.get_or_create(99, hid, "N", "ru")
 
-    assert out == dto
+    assert out == dto  # noqa: S101
     mock_holder_dao.guest.get_or_create.assert_awaited_once()
 
 
@@ -62,4 +62,4 @@ async def test_get_or_create_existing_guest(
 
     out = await guest_service.get_or_create(99, hid, "N", "ru")
 
-    assert out == dto
+    assert out == dto  # noqa: S101

@@ -1,0 +1,51 @@
+# Canonical Ruff config for all bira bots (source of truth).
+#
+# Each bot is a SEPARATE git repo, so this file is VENDORED (copied) into each
+# project root and extended locally - cross-repo `extend` would break in CI/Docker
+# where only the bot's own repo is checked out.
+#
+# In a bot's pyproject.toml:
+#   [tool.ruff]
+#   extend = "ruff-base.toml"        # vendored copy in the project root
+#   [tool.ruff.lint.per-file-ignores]
+#   ...                              # project-specific ignores stay here
+#
+# Propagate changes: edit THIS file, then copy into each bot (or `make sync-devtools`).
+
+target-version = "py312"
+line-length = 88
+
+[lint]
+select = [
+  "E", "F", "W",     # pycodestyle / pyflakes
+  "B",               # bugbear
+  "BLE",             # blind except
+  "I",               # import sorting
+  "UP",              # pyupgrade
+  "SIM",             # simplify
+  "C4",              # comprehensions
+  "RET",             # return smells
+  "ARG",             # unused args
+  "ANN",             # type annotations
+  "S",               # security (incl. try/except/pass)
+  "RUF",             # ruff-specific
+  "ASYNC",           # async anti-patterns
+  "DTZ",             # datetime tz safety
+  "TRY",             # try/except hygiene
+  "LOG",             # logging issues
+  "G",               # logging format strings
+]
+ignore = [
+  "E501",
+  "RUF001", "RUF002", "RUF003",
+  "ANN401",
+  "G004", "G201",
+  "TRY002", "TRY003", "TRY300", "TRY301", "TRY400", "TRY401",
+  "RUF012",
+  "SIM102", "SIM103", "SIM105", "SIM108", "SIM110", "SIM117",
+  "DTZ003", "DTZ005", "DTZ007", "DTZ011",
+  "E712", "B007", "RET504", "C408",
+  "ASYNC109", "ASYNC110",
+  "S311",
+]
+fixable = ["ALL"]

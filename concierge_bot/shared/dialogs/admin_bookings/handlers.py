@@ -11,7 +11,7 @@ from concierge_bot.shared.states import AdminBookingsSG
 
 async def on_select_booking(
     _: CallbackQuery,
-    widget: Any,
+    widget: Any,  # noqa: ARG001
     manager: DialogManager,
     item_id: str,
 ) -> None:

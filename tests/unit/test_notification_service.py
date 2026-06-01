@@ -16,7 +16,7 @@ async def test_notify_admin(mock_bot: MagicMock) -> None:
         name="H",
         admin_chat_id=500,
         forum_chat_id=None,
-        bot_token="t",
+        bot_token="t",  # noqa: S106
         max_bot_token=None,
         system_prompt=None,
         is_active=True,
@@ -59,10 +59,10 @@ async def test_notify_admin(mock_bot: MagicMock) -> None:
         parse_mode="HTML",
     )
     text = mock_bot.send_message.call_args[0][1]
-    assert "Ivan" in text
-    assert "Dinner" in text
-    assert "pending" in text
-    assert "2 people" in text
+    assert "Ivan" in text  # noqa: S101
+    assert "Dinner" in text  # noqa: S101
+    assert "pending" in text  # noqa: S101
+    assert "2 people" in text  # noqa: S101
 
 
 @pytest.mark.asyncio
@@ -93,4 +93,4 @@ async def test_notify_guest(mock_bot: MagicMock) -> None:
         mock_bot.send_message.call_args[0][1],
         parse_mode="HTML",
     )
-    assert str(booking.id) in mock_bot.send_message.call_args[0][1]
+    assert str(booking.id) in mock_bot.send_message.call_args[0][1]  # noqa: S101

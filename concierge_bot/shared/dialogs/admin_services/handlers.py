@@ -14,7 +14,7 @@ from concierge_bot.shared.states import AdminServicesSG
 
 async def on_select_service(
     _: CallbackQuery,
-    widget: Any,
+    widget: Any,  # noqa: ARG001
     manager: DialogManager,
     item_id: str,
 ) -> None:
@@ -48,7 +48,7 @@ async def on_add_name(
 
 async def on_pick_category(
     _: CallbackQuery,
-    widget: Any,
+    widget: Any,  # noqa: ARG001
     manager: DialogManager,
     item_id: str,
 ) -> None:
