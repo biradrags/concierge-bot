@@ -6,14 +6,14 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.asyncio
-async def test_get_guest_by_forum_thread(db_session) -> None:
+async def test_get_guest_by_forum_thread(db_session) -> None:  # noqa: ANN001
     holder = HolderDao(db_session)
     forum_id = -100_123_456_789
     h = await holder.hotel.create(
         name="Forum Hotel",
         admin_chat_id=990_001,
         forum_chat_id=forum_id,
-        bot_token="forum-bot",
+        bot_token="forum-bot",  # noqa: S106
     )
     g, _ = await holder.guest.get_or_create(
         telegram_user_id=77_777,
@@ -25,8 +25,8 @@ async def test_get_guest_by_forum_thread(db_session) -> None:
     await db_session.commit()
 
     found = await holder.guest.get_by_forum_thread(forum_id, 42)
-    assert found is not None
-    assert found.telegram_user_id == 77_777
+    assert found is not None  # noqa: S101
+    assert found.telegram_user_id == 77_777  # noqa: S101
 
     missing = await holder.guest.get_by_forum_thread(forum_id, 99)
-    assert missing is None
+    assert missing is None  # noqa: S101

@@ -8,17 +8,17 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.asyncio
-async def test_same_user_different_hotels(db_session) -> None:
+async def test_same_user_different_hotels(db_session) -> None:  # noqa: ANN001
     holder = HolderDao(db_session)
     h1 = await holder.hotel.create(
         name="H1",
         admin_chat_id=770_001,
-        bot_token="t1",
+        bot_token="t1",  # noqa: S106
     )
     h2 = await holder.hotel.create(
         name="H2",
         admin_chat_id=770_002,
-        bot_token="t2",
+        bot_token="t2",  # noqa: S106
     )
     await db_session.commit()
 
@@ -28,12 +28,12 @@ async def test_same_user_different_hotels(db_session) -> None:
 
 
 @pytest.mark.asyncio
-async def test_same_user_same_hotel(db_session) -> None:
+async def test_same_user_same_hotel(db_session) -> None:  # noqa: ANN001
     holder = HolderDao(db_session)
     h = await holder.hotel.create(
         name="H",
         admin_chat_id=770_010,
-        bot_token="tx",
+        bot_token="tx",  # noqa: S106
     )
     await db_session.commit()
 

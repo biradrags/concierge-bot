@@ -15,7 +15,7 @@ async def test_get_by_admin_chat_id_found(mock_session: MagicMock) -> None:
         name="H",
         admin_chat_id=100,
         forum_chat_id=None,
-        bot_token="t",
+        bot_token="t",  # noqa: S106
         max_bot_token=None,
         system_prompt=None,
         is_active=True,
@@ -28,9 +28,9 @@ async def test_get_by_admin_chat_id_found(mock_session: MagicMock) -> None:
     dao = HotelDao(mock_session)
     dto = await dao.get_by_admin_chat_id(100)
 
-    assert dto is not None
-    assert dto.admin_chat_id == 100
-    assert dto.name == "H"
+    assert dto is not None  # noqa: S101
+    assert dto.admin_chat_id == 100  # noqa: S101
+    assert dto.name == "H"  # noqa: S101
     mock_session.scalars.assert_awaited()
 
 
@@ -43,7 +43,7 @@ async def test_get_by_admin_chat_id_not_found(mock_session: MagicMock) -> None:
     dao = HotelDao(mock_session)
     dto = await dao.get_by_admin_chat_id(999)
 
-    assert dto is None
+    assert dto is None  # noqa: S101
 
 
 @pytest.mark.asyncio
@@ -56,13 +56,13 @@ async def test_create_hotel(mock_session: MagicMock) -> None:
         id=hid,
         name="New",
         admin_chat_id=55,
-        bot_token="tok",
+        bot_token="tok",  # noqa: S106
         is_active=True,
         created_at=now,
     )
 
-    assert dto.id == hid
-    assert dto.name == "New"
-    assert dto.admin_chat_id == 55
+    assert dto.id == hid  # noqa: S101
+    assert dto.name == "New"  # noqa: S101
+    assert dto.admin_chat_id == 55  # noqa: S101
     mock_session.add.assert_called_once()
     mock_session.flush.assert_awaited_once()

@@ -40,7 +40,7 @@ def _hotel() -> HotelDTO:
         name="H",
         admin_chat_id=1,
         forum_chat_id=123,
-        bot_token="t",
+        bot_token="t",  # noqa: S106
         max_bot_token=None,
         system_prompt=None,
         is_active=True,
@@ -60,7 +60,7 @@ def _guest() -> GuestDTO:
     )
 
 
-def _service(hotel_id) -> ServiceDTO:
+def _service(hotel_id) -> ServiceDTO:  # noqa: ANN001
     return ServiceDTO(
         id=uuid4(),
         hotel_id=hotel_id,
@@ -103,7 +103,7 @@ async def test_create_booking(
         notes="note",
     )
 
-    assert result.status == "pending"
+    assert result.status == "pending"  # noqa: S101
     dao.booking.create.assert_awaited_once()
     mock_bot.send_message.assert_awaited()
 
@@ -130,7 +130,7 @@ async def test_create_booking_skips_forum_without_topic(
 
     await booking_service.create_booking(guest, service.id, hotel, None)
 
-    assert mock_bot.send_message.await_count == 1
+    assert mock_bot.send_message.await_count == 1  # noqa: S101
 
 
 @pytest.mark.asyncio
@@ -157,7 +157,7 @@ async def test_confirm_booking(
 
     result = await booking_service.confirm_booking(booking_id)
 
-    assert result.status == "confirmed"
+    assert result.status == "confirmed"  # noqa: S101
     dao.booking.update_status.assert_awaited_once_with(booking_id, "confirmed")
     mock_bot.send_message.assert_awaited()
 
@@ -186,6 +186,6 @@ async def test_cancel_booking(
 
     result = await booking_service.cancel_booking(booking_id)
 
-    assert result.status == "cancelled"
+    assert result.status == "cancelled"  # noqa: S101
     dao.booking.update_status.assert_awaited_once_with(booking_id, "cancelled")
     mock_bot.send_message.assert_awaited()

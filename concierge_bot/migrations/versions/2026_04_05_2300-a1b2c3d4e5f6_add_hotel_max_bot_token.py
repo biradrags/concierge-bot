@@ -6,15 +6,15 @@ Create Date: 2026-04-05 23:00:00.000000
 
 """
 
-from typing import Sequence, Union
+from typing import Sequence, Union  # noqa: UP035
 
 import sqlalchemy as sa
 from alembic import op
 
 revision: str = "a1b2c3d4e5f6"
-down_revision: Union[str, None] = "df71ba22e9c4"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: Union[str, None] = "df71ba22e9c4"  # noqa: UP007
+branch_labels: Union[str, Sequence[str], None] = None  # noqa: UP007
+depends_on: Union[str, Sequence[str], None] = None  # noqa: UP007
 
 
 def upgrade() -> None:

@@ -2,7 +2,7 @@
 .PHONY: run run-polling run-maxbot
 .PHONY: docker-up docker-down docker-logs
 .PHONY: db-upgrade db-downgrade db-revision db-current
-.PHONY: test test-unit test-integration check lint lint-fix typecheck
+.PHONY: test test-unit test-integration check lint lint-fix typecheck rules-check
 
 help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*##"; printf "\n"} /^[a-zA-Z0-9_-]+:.*##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
@@ -76,6 +76,8 @@ lint-fix: ## Ruff check with auto-fix
 typecheck: ## Mypy
 	uv run mypy concierge_bot
 
-check: ## Lint + tests (no typecheck until codebase stabilizes)
-	uv run ruff check .
-	uv run pytest tests -v
+rules-check: ## Semantic rule checks not expressible in Ruff (money=Decimal)
+	@echo "🔍 Running rules_check..."
+	uv run python scripts/rules_check.py concierge_bot
+
+check: lint rules-check test ## Lint + rules + tests (no typecheck until codebase stabilizes)

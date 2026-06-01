@@ -8,11 +8,11 @@ from concierge_bot.dto import HotelDTO
 from concierge_bot.shared.categories import CATEGORIES
 
 
-async def get_categories(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:
+async def get_categories(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:  # noqa: ARG001
     return {"categories": CATEGORIES}
 
 
-async def get_services_by_category(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:
+async def get_services_by_category(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:  # noqa: ARG001
     hotel: HotelDTO | None = dialog_manager.middleware_data.get("hotel")
     dao: HolderDao = dialog_manager.middleware_data["dao"]
     cat = dialog_manager.dialog_data.get("category")
@@ -23,7 +23,7 @@ async def get_services_by_category(dialog_manager: DialogManager, **kwargs: Any)
     return {"services": items}
 
 
-async def get_service_detail_guest(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:
+async def get_service_detail_guest(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:  # noqa: ARG001
     dao: HolderDao = dialog_manager.middleware_data["dao"]
     sid = dialog_manager.dialog_data.get("service_id")
     if not sid:
@@ -37,5 +37,5 @@ async def get_service_detail_guest(dialog_manager: DialogManager, **kwargs: Any)
     }
 
 
-async def get_booked_done(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:
+async def get_booked_done(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:  # noqa: ARG001
     return {"done": "Запрос отправлен администратору."}
