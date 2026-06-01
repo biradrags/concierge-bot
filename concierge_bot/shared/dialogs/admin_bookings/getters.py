@@ -7,7 +7,7 @@ from concierge_bot.dao import HolderDao
 from concierge_bot.dto import HotelDTO
 
 
-async def get_pending_bookings(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:
+async def get_pending_bookings(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:  # noqa: ARG001
     hotel: HotelDTO | None = dialog_manager.middleware_data.get("hotel")
     dao: HolderDao = dialog_manager.middleware_data["dao"]
     if hotel is None:
@@ -25,7 +25,7 @@ async def get_pending_bookings(dialog_manager: DialogManager, **kwargs: Any) -> 
     return {"bookings": items}
 
 
-async def get_booking_detail(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:
+async def get_booking_detail(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:  # noqa: ARG001
     dao: HolderDao = dialog_manager.middleware_data["dao"]
     raw = dialog_manager.dialog_data.get("booking_id")
     if not raw:

@@ -11,7 +11,7 @@ from concierge_bot.shared.states import GuestServicesSG
 
 async def on_select_category(
     _: CallbackQuery,
-    widget: Any,
+    widget: Any,  # noqa: ARG001
     manager: DialogManager,
     item_id: str,
 ) -> None:
@@ -21,7 +21,7 @@ async def on_select_category(
 
 async def on_select_service(
     _: CallbackQuery,
-    widget: Any,
+    widget: Any,  # noqa: ARG001
     manager: DialogManager,
     item_id: str,
 ) -> None:

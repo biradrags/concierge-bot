@@ -15,7 +15,7 @@ DEFAULT_TEST_URL = (
 
 
 @pytest_asyncio.fixture
-async def db_engine():
+async def db_engine():  # noqa: ANN201
     url = os.environ.get("CONCIERGE_TEST_DATABASE_URL", DEFAULT_TEST_URL)
     engine = create_async_engine(url, poolclass=NullPool)
     try:
@@ -24,7 +24,7 @@ async def db_engine():
     except OSError as exc:
         await engine.dispose()
         pytest.skip(f"PostgreSQL unavailable ({exc})")
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         await engine.dispose()
         pytest.skip(f"PostgreSQL unavailable ({exc})")
     async with engine.begin() as conn:
@@ -37,19 +37,19 @@ async def db_engine():
 
 
 @pytest_asyncio.fixture
-async def db_session(db_engine) -> AsyncSession:
+async def db_session(db_engine) -> AsyncSession:  # noqa: ANN001
     Session = async_sessionmaker(db_engine, expire_on_commit=False)
     async with Session() as session:
         yield session
 
 
 @pytest_asyncio.fixture
-async def seed_hotel(db_session: AsyncSession):
+async def seed_hotel(db_session: AsyncSession):  # noqa: ANN201
     holder = HolderDao(db_session)
     h = await holder.hotel.create(
         name="Seed Hotel",
         admin_chat_id=880_001,
-        bot_token="seed-token",
+        bot_token="seed-token",  # noqa: S106
     )
     await holder.service.create(
         hotel_id=h.id,

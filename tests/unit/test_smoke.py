@@ -1,2 +1,2 @@
 def test_smoke() -> None:
-    assert True
+    assert True  # noqa: S101

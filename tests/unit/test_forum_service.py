@@ -15,7 +15,7 @@ async def test_create_topic(mock_bot: MagicMock) -> None:
     svc = ForumService(mock_bot)
     tid = await svc.create_topic(1000, "Topic name here")
 
-    assert tid == 42
+    assert tid == 42  # noqa: S101
     mock_bot.create_forum_topic.assert_awaited_once_with(
         chat_id=1000,
         name="Topic name here"[:128],
@@ -62,10 +62,10 @@ async def test_mirror_booking(mock_bot: MagicMock) -> None:
 
     mock_bot.send_message.assert_awaited_once()
     kwargs = mock_bot.send_message.call_args.kwargs
-    assert kwargs["message_thread_id"] == 2
+    assert kwargs["message_thread_id"] == 2  # noqa: S101
     kb = kwargs["reply_markup"]
-    assert kb.inline_keyboard
+    assert kb.inline_keyboard  # noqa: S101
     row = kb.inline_keyboard[0]
-    assert isinstance(row[0], InlineKeyboardButton)
-    assert row[0].callback_data.startswith("bk:ok:")
-    assert row[1].callback_data.startswith("bk:no:")
+    assert isinstance(row[0], InlineKeyboardButton)  # noqa: S101
+    assert row[0].callback_data.startswith("bk:ok:")  # noqa: S101
+    assert row[1].callback_data.startswith("bk:no:")  # noqa: S101

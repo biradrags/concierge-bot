@@ -38,7 +38,7 @@ async def test_create_booking_service_not_found(
         name="H",
         admin_chat_id=1,
         forum_chat_id=None,
-        bot_token="t",
+        bot_token="t",  # noqa: S106
         max_bot_token=None,
         system_prompt=None,
         is_active=True,
