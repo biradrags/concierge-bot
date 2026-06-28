@@ -108,42 +108,7 @@ concierge-bot/
 
 ## Модели БД (hotel-архитектура)
 
-```python
-# Hotel — отель/вилла на платформе
-id: UUID (PK)
-name: str
-telegram_chat_id: str (unique)   # chat_id администратора отеля
-bot_token: SecretStr              # токен бота для гостей
-is_active: bool = True
-created_at: datetime
-
-# Service — сервис, предлагаемый отелем
-id: UUID (PK)
-hotel_id: UUID (FK → Hotel)
-name: str
-category: str   # restaurant | tour | transport | spa | other
-description: str
-price: Decimal
-currency: str = "USD"
-is_active: bool = True
-
-# Guest — гость отеля
-id: UUID (PK)
-telegram_user_id: str
-hotel_id: UUID (FK → Hotel)
-name: str
-language_code: str = "en"
-created_at: datetime
-# UNIQUE (telegram_user_id, hotel_id)
-
-# Booking — бронирование гостя
-id: UUID (PK)
-guest_id: UUID (FK → Guest)
-service_id: UUID (FK → Service)
-status: BookingStatus  # pending | confirmed | cancelled | completed
-notes: str | None
-created_at: datetime
-```
+ORM-модели: `concierge_bot/db/models.py` (Hotel, Service, Guest, Booking).
 
 ---
 
