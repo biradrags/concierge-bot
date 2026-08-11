@@ -1,14 +1,15 @@
 import logging
 
 from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.base import BaseStorage
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.base import BaseStorage, DefaultKeyBuilder
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
 from aiogram_dialog import setup_dialogs
 from dishka import AsyncContainer, Provider, Scope, provide
 from dishka.integrations.aiogram import setup_dishka
 
 from concierge_bot.config import BaseConfig
+from concierge_bot.tgbot import errors
 from concierge_bot.tgbot.dialogs import setup_concierge_dialogs
 from concierge_bot.tgbot.handlers import setup_handlers
 from concierge_bot.tgbot.middlewares import (
@@ -23,8 +24,13 @@ class TgProvider(Provider):
     scope = Scope.APP
 
     @provide
-    def fsm_storage(self) -> BaseStorage:
-        return MemoryStorage()
+    def fsm_storage(self, config: BaseConfig) -> BaseStorage:
+        # FSM должен переживать рестарты Fly - in-memory storage теряет state на каждый деплой.
+        # with_destiny обязателен: aiogram_dialog держит несколько FSM-контекстов на чат.
+        return RedisStorage.from_url(
+            config.redis_url,
+            key_builder=DefaultKeyBuilder(with_destiny=True),
+        )
 
     @provide
     def dispatcher(
@@ -34,6 +40,9 @@ class TgProvider(Provider):
     ) -> Dispatcher:
         dp = Dispatcher(storage=storage)
         setup_dishka(container=container, router=dp)
+        # errors.router ПЕРВЫМ: stale-intent (UnknownIntent/OutdatedIntent) должен
+        # перехватываться до того, как диалоговые роутеры пробуют обработать апдейт.
+        dp.include_router(errors.router)
         setup_middlewares(dp)
         setup_dialogs(dp)
         setup_dialog_data_middleware(dp)
