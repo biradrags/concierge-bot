@@ -85,7 +85,7 @@ class BookingDao(BaseDAO[Booking]):
         booking = await self._get_by_id(booking_id)
         if booking is None:
             msg = f"Booking {booking_id} not found"
-            raise ValueError(msg)
+            raise ValueError(msg)  # dao-raise-ok: guard when booking id missing in update_status
         booking.status = status
         await self._flush()
         return _booking_shallow(booking)

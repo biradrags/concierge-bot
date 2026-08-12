@@ -1,3 +1,5 @@
+import html
+
 from aiogram import Bot, Router
 from aiogram.filters import Command
 from aiogram.types import Message
@@ -46,7 +48,9 @@ async def cmd_mybookings(
     for b in rows:
         em = _STATUS_EMOJI.get(b.status, "•")
         svc = b.service.name if b.service else "услуга"
-        lines.append(f"{em} {svc} — <code>{b.id}</code> ({b.status})")
+        lines.append(
+            f"{em} {html.escape(svc)} — <code>{b.id}</code> ({html.escape(b.status)})"
+        )
     await message.answer(
         "<b>Ваши брони</b>\n" + "\n".join(lines),
     )

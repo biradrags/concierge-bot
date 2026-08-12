@@ -19,8 +19,9 @@ class StructuredOutputRetryMiddleware(ChatMiddleware):
         for attempt in range(1, self._max_retries + 1):
             try:
                 await call_next()
-                return
             except ChatClientInvalidResponseException as e:
                 if attempt >= self._max_retries:
                     raise
                 logger.warning("Structured output retry %s/%s: %s", attempt, self._max_retries, e)
+            else:
+                return

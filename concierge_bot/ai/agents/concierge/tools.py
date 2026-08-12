@@ -57,6 +57,7 @@ async def create_booking(
             notes=notes,
         )
         state.last_booking = booking
-        return f"Booking created (pending): {booking.id}. The hotel will confirm soon."
     except ValueError as e:
         return f"Could not book: {e}"
+    else:
+        return f"Booking created (pending): {booking.id}. The hotel will confirm soon."

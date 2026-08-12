@@ -1,3 +1,5 @@
+import html
+
 from aiogram import Bot
 from aiogram.enums import ParseMode
 
@@ -21,7 +23,7 @@ class NotificationService:
             f"Гость: {guest_label}\n"
             f"Услуга: {service.name}\n"
             f"Статус: {booking.status}\n"
-            f"ID брони: <code>{booking.id}</code>"
+            f"ID брони: <code>{booking.id}</code>"  # html-escape-ok: UUID from ORM
         )
         if booking.notes:
             text += f"\nЗаметки: {booking.notes}"
@@ -39,7 +41,7 @@ class NotificationService:
     ) -> None:
         text = (
             "<b>Статус брони обновлён</b>\n"
-            f"Бронь <code>{booking.id}</code>: {status}"
+            f"Бронь <code>{booking.id}</code>: {html.escape(status)}"
         )
         await self._bot.send_message(
             guest.telegram_user_id,

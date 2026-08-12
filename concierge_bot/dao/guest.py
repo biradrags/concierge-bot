@@ -70,6 +70,6 @@ class GuestDao(BaseDAO[Guest]):
         guest = await self._get_by_id(guest_id)
         if guest is None:
             msg = f"Guest {guest_id} not found"
-            raise ValueError(msg)
+            raise ValueError(msg)  # dao-raise-ok: guard when guest id missing in update_forum_topic_id
         guest.forum_topic_id = topic_id
         await self._flush()
