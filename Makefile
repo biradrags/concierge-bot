@@ -68,10 +68,10 @@ test-integration: ## Integration tests only (needs Postgres, see docker-up)
 	uv run pytest tests -m integration -v
 
 lint: ## Ruff check
-	uv run ruff check .
+	uvx ruff@0.16.0 check .
 
 lint-fix: ## Ruff check with auto-fix
-	uv run ruff check --fix .
+	uvx ruff@0.16.0 check --fix .
 
 typecheck: ## Mypy
 	uv run mypy concierge_bot

@@ -1,4 +1,4 @@
-from concierge_bot.ai.middleware.logging import (
+from concierge_bot.ai.middleware.log import (
     FunctionLoggingMiddleware,
     LoggingMiddleware,
 )

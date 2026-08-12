@@ -7,7 +7,7 @@ from aiogram import Bot, Dispatcher
 from concierge_bot.config import get_config
 from concierge_bot.main_factory import create_dishka
 from concierge_bot.tgbot.main_factory import resolve_update_types
-from concierge_bot.utils.logging import setup_logging
+from concierge_bot.utils.log import setup_logging
 
 logger = logging.getLogger(__name__)
 

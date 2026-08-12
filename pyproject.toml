@@ -36,7 +36,7 @@ test = [
     "pytest-cov>=4.1.0,<5.0",
 ]
 lint = [
-    "ruff>=0.8.0,<0.9",
+    "ruff>=0.16,<0.17",
     "mypy>=1.13.0,<2.0",
 ]
 
@@ -57,6 +57,9 @@ line_length = 88
 
 [tool.ruff]
 extend = "ruff-base.toml"
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/**/*.py" = ["ANN", "ARG", "BLE", "S", "E741", "DTZ", "B904"]
 
 [tool.uv]
 prerelease = "allow"
