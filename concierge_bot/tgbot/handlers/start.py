@@ -1,3 +1,5 @@
+import html
+
 from aiogram import Bot, Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
@@ -54,6 +56,6 @@ async def cmd_start(
         await dao.commit()
 
     await message.answer(
-        f"Добро пожаловать в <b>{hotel.name}</b>! Напишите, чем помочь — экскурсии, столик, трансфер.\n"
+        f"Добро пожаловать в <b>{html.escape(hotel.name)}</b>! Напишите, чем помочь — экскурсии, столик, трансфер.\n"
         "/mybookings — ваши брони.",
     )

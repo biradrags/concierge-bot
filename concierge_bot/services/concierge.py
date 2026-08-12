@@ -56,7 +56,8 @@ class ConciergeService:
                     self._forum.mirror_message(hotel.forum_chat_id, guest.forum_topic_id, "Guest", text),
                     self._forum.mirror_message(hotel.forum_chat_id, guest.forum_topic_id, "AI", msg),
                 )
-            return msg
         except Exception:
             logger.exception("concierge agent failed")
             return "Извините, сейчас не получилось ответить. Попробуйте позже."
+        else:
+            return msg

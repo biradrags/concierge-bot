@@ -41,7 +41,7 @@ async def get_booking_detail(dialog_manager: DialogManager, **kwargs: Any) -> di
         f"Услуга: {svc_name}\n"
         f"Гость: {guest_label}\n"
         f"Статус: {b.status}\n"
-        f"ID: <code>{b.id}</code>"
+        f"ID: <code>{b.id}</code>"  # html-escape-ok: UUID from ORM
     )
     if b.notes:
         text += f"\nЗаметки: {b.notes}"

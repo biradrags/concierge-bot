@@ -1,3 +1,5 @@
+import html
+
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -20,7 +22,7 @@ class ForumService:
         sender: str,
         text: str,
     ) -> None:
-        body = f"<b>{sender}</b>\n{text}"
+        body = f"<b>{html.escape(sender)}</b>\n{html.escape(text)}"
         await self._bot.send_message(
             forum_chat_id,
             body,
@@ -53,7 +55,7 @@ class ForumService:
         text = (
             "<b>Бронь (ожидает решения)</b>\n"
             f"Услуга: {service.name}\n"
-            f"ID: <code>{bid}</code>\n"
+            f"ID: <code>{bid}</code>\n"  # html-escape-ok: UUID string from booking.id
             f"Статус: {booking.status}"
         )
         if booking.notes:

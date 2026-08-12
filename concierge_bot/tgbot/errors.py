@@ -26,11 +26,11 @@ async def on_stale_intent(event: ErrorEvent, bot: Bot) -> bool:
     )
     try:
         await bot.delete_message(chat_id=cb.message.chat.id, message_id=cb.message.message_id)
-    except Exception:  # noqa: BLE001 - сообщение могло быть уже удалено, граница фреймворка
+    except Exception:
         logger.debug("stale intent: delete_message failed", exc_info=True)
     try:
         # Без тоста: пользователь уже видит свежий диалог, alert только путает (канон dialogs.md).
         await cb.answer()
-    except Exception:  # noqa: BLE001 - query too old (сам stale-intent случай), граница фреймворка
+    except Exception:
         logger.debug("stale intent: cb.answer failed", exc_info=True)
     return True

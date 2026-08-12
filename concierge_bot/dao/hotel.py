@@ -54,7 +54,7 @@ class HotelDao(BaseDAO[Hotel]):
         hotel = await self._get_by_id(hotel_id)
         if hotel is None:
             msg = f"Hotel {hotel_id} not found"
-            raise ValueError(msg)
+            raise ValueError(msg)  # dao-raise-ok: guard when hotel id missing in update
         for k, v in kwargs.items():
             setattr(hotel, k, v)
         await self._flush()

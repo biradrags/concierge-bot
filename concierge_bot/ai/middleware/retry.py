@@ -52,10 +52,9 @@ class RetryMiddleware(AgentMiddleware):
         for attempt in range(1, self._max_attempts + 1):
             try:
                 await call_next()
-                return
             except ChatClientContentFilterException:
                 raise
-            except BaseException as e:
+            except Exception as e:
                 last_exc = e
                 if attempt < self._max_attempts and self._retry_if(e):
                     if is_retriable_history_error(e):
@@ -77,5 +76,7 @@ class RetryMiddleware(AgentMiddleware):
                     await asyncio.sleep(delay)
                 else:
                     raise
+            else:
+                return
         if last_exc:
             raise last_exc

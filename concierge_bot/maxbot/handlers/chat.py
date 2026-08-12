@@ -1,3 +1,4 @@
+import html
 import logging
 from typing import Any
 
@@ -43,7 +44,7 @@ async def cmd_start(update: MessageCreated, ctx: Ctx) -> None:
         )
         return
     text = (
-        f"<b>{hotel.name}</b>\n"
+        f"<b>{html.escape(hotel.name)}</b>\n"
         "Я помогу с услугами и бронированием. Просто напишите запрос.\n"
         "/mybookings — список броней\n"
         "/admin — админка (Telegram)"
@@ -73,8 +74,10 @@ async def _format_bookings(dao: HolderDao, guest: GuestDTO) -> str:
         return "<b>Брони</b>\nПока нет активных записей."
     parts = ["<b>Ваши брони</b>"]
     for b in rows[:20]:
-        sname = b.service.name if b.service else str(b.service_id)
-        parts.append(f"• {sname} — <code>{b.status}</code> — <code>{b.id}</code>")
+        sname = html.escape(b.service.name if b.service else str(b.service_id))
+        parts.append(
+            f"• {sname} — <code>{html.escape(b.status)}</code> — <code>{b.id}</code>"
+        )
     return "\n".join(parts)
 
 

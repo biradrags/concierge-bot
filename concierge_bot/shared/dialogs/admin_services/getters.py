@@ -1,3 +1,4 @@
+import html
 from typing import Any
 from uuid import UUID
 
@@ -28,7 +29,7 @@ async def get_service_detail(dialog_manager: DialogManager, **kwargs: Any) -> di
         return {"detail": "Не найдено"}
     price = f"{s.price} {s.currency}" if s.price is not None else "—"
     text = (
-        f"<b>{s.name}</b>\n"
+        f"<b>{html.escape(s.name)}</b>\n"
         f"Категория: {s.category}\n"
         f"Цена: {price}\n"
         f"Описание: {s.description or '—'}"

@@ -57,7 +57,7 @@ class ServiceDao(BaseDAO[Service]):
         service = await self._get_by_id(service_id)
         if service is None:
             msg = f"Service {service_id} not found"
-            raise ValueError(msg)
+            raise ValueError(msg)  # dao-raise-ok: guard when service id missing in update
         for k, v in kwargs.items():
             setattr(service, k, v)
         await self._flush()
@@ -67,6 +67,6 @@ class ServiceDao(BaseDAO[Service]):
         service = await self._get_by_id(service_id)
         if service is None:
             msg = f"Service {service_id} not found"
-            raise ValueError(msg)
+            raise ValueError(msg)  # dao-raise-ok: guard when service id missing in delete
         await self._delete(service)
         await self._flush()
