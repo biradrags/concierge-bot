@@ -16,6 +16,7 @@ from concierge_bot.tgbot.middlewares import (
     setup_dialog_data_middleware,
     setup_middlewares,
 )
+from concierge_bot.utils.redis_client import make_redis_client
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +28,8 @@ class TgProvider(Provider):
     def fsm_storage(self, config: BaseConfig) -> BaseStorage:
         # FSM должен переживать рестарты Fly - in-memory storage теряет state на каждый деплой.
         # with_destiny обязателен: aiogram_dialog держит несколько FSM-контекстов на чат.
-        return RedisStorage.from_url(
-            config.redis_url,
+        return RedisStorage(
+            redis=make_redis_client(str(config.redis_url)),
             key_builder=DefaultKeyBuilder(with_destiny=True),
         )
 
