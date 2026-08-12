@@ -8,13 +8,13 @@ import logging
 from aiogram import Bot, Router
 from aiogram.filters import ExceptionTypeFilter
 from aiogram.types import ErrorEvent
-from aiogram_dialog.api.exceptions import OutdatedIntent, UnknownIntent
+from aiogram_dialog.api.exceptions import OutdatedIntent, UnknownIntent, UnknownState
 
 logger = logging.getLogger(__name__)
 router = Router(name="errors")
 
 
-@router.errors(ExceptionTypeFilter(UnknownIntent, OutdatedIntent))
+@router.errors(ExceptionTypeFilter(UnknownIntent, UnknownState, OutdatedIntent))
 async def on_stale_intent(event: ErrorEvent, bot: Bot) -> bool:
     cb = event.update.callback_query
     if cb is None or cb.message is None:
