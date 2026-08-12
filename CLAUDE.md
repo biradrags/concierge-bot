@@ -30,9 +30,7 @@ Telegram concierge bot для отелей и вилл на Бали.
 
 **Стек:** Python 3.12, aiogram 3.x, aiogram_dialog, SQLAlchemy + asyncpg, PostgreSQL 16, dishka DI, uv, Fly.io
 
-**Fly.io приложения:**
-- `bali-concierge` — бот (sin)
-- `bali-concierge-db` — PostgreSQL кластер (sin)
+**Fly.io приложения:** не созданы — проект не развёрнут (см. «Деплой»). Имена, заложенные в `fly.toml`: `bali-concierge` (бот), `bali-concierge-db` (PostgreSQL).
 
 ---
 
@@ -111,18 +109,9 @@ uv sync --extra lint
 
 ## Деплой
 
-```bash
-# Задеплоить бота
-fly deploy --remote-only
+**Проект НЕ развёрнут** (решение Ивана 2026-08-12): приложений `bali-concierge` / `bali-concierge-db` на Fly не существует, репозиторий живёт как образец архитектуры. Деплой-workflow снят — он падал с апреля 2026 (`FLY_API_TOKEN` в секретах репо пустой) и держал CI красным без пользы.
 
-# Логи
-fly logs --app bali-concierge -f
-
-# Подключиться к БД
-fly pg connect --app bali-concierge-db --database concierge_bot
-```
-
-Миграции — см. корневой CLAUDE.md → «Политика деплоя» (руками не катить; `fly.toml` этого проекта пока БЕЗ `release_command` — открытый gap, не фиксится в рамках этой правки).
+Если проект оживёт: завести приложения на Fly (org `personal`), вернуть `.github/workflows/fly-deploy.yml` по образцу metrika-bot, задать секрет, добавить `release_command = 'alembic upgrade head'` в `fly.toml` (сейчас его нет — открытый gap). Команды после этого стандартные: `fly deploy --remote-only`, `fly logs --app <app> -f`.
 
 ---
 
