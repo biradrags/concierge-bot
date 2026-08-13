@@ -2,15 +2,45 @@ import logging
 import re
 from typing import Any
 
-SENSITIVE_KEY_PATTERNS = (
-    "key",
-    "token",
-    "secret",
-    "password",
-    "api_key",
-    "dsn",
-    "hash",
+# Имена полей, значение которых маскируется целиком. Матчинг ТОЧНЫЙ (полное имя
+# или суффикс), а не по подстроке: подстрочный вариант съедал доменные поля -
+# `token_id` (тикер монеты USDT в обменниках), `phash` (перцептивный хеш
+# аватарки, по нему считается drift), `key` (путь объекта в приватном бакете).
+# Все три - публичные величины, ради которых логи и читают; маскировка их
+# обесценивала. Найдено параллельными сессиями на переводе логов 2026-08-13.
+#
+# `hash` убран совсем: хеш - уже необратимое представление, секретом не является.
+SENSITIVE_KEY_NAMES = frozenset(
+    {
+        "token",
+        "secret",
+        "password",
+        "passwd",
+        "pwd",
+        "dsn",
+        "auth",
+        "authorization",
+        "credentials",
+        "api_key",
+        "apikey",
+        "secret_key",
+        "private_key",
+        "access_key",
+        "session_string",
+    }
 )
+SENSITIVE_KEY_SUFFIXES = (
+    "_token",
+    "_secret",
+    "_password",
+    "_api_key",
+    "_apikey",
+    "_dsn",
+    "_credentials",
+)
+# Для поиска `ключ=значение` внутри свободного текста: там имя не отделено, поэтому
+# ищем по этим основам, а точность добирается тем же предикатом `_is_sensitive_key`.
+SENSITIVE_KEY_PATTERNS = ("token", "secret", "password", "api_key", "dsn", "auth")
 PREFIX_LEN = 4
 SUFFIX_LEN = 4
 MASK = "***"
@@ -41,7 +71,7 @@ def redact_string(s: str) -> str:
 
 def _is_sensitive_key(key: str) -> bool:
     k = key.lower()
-    return any(p in k for p in SENSITIVE_KEY_PATTERNS)
+    return k in SENSITIVE_KEY_NAMES or k.endswith(SENSITIVE_KEY_SUFFIXES)
 
 
 def _is_countable(value: str) -> bool:
@@ -64,9 +94,12 @@ def redact_log_message(text: str) -> str:
             re.IGNORECASE,
         )
         text = pattern.sub(
-            lambda m: m.group(0)
-            if _is_countable(m.group(2))
-            else m.group(1) + _mask_value(m.group(2)),
+            lambda m: (
+                m.group(0)
+                if _is_countable(m.group(2))
+                or not _is_sensitive_key(m.group(1).split("=")[0].strip())
+                else m.group(1) + _mask_value(m.group(2))
+            ),
             text,
         )
         quoted = re.compile(
@@ -74,9 +107,12 @@ def redact_log_message(text: str) -> str:
             re.IGNORECASE,
         )
         text = quoted.sub(
-            lambda m: m.group(0)
-            if _is_countable(m.group(2))
-            else m.group(1) + "'" + _mask_value(m.group(2)) + "'",
+            lambda m: (
+                m.group(0)
+                if _is_countable(m.group(2))
+                or not _is_sensitive_key(m.group(1).split("=")[0].strip())
+                else m.group(1) + "'" + _mask_value(m.group(2)) + "'"
+            ),
             text,
         )
     return text
@@ -139,7 +175,8 @@ class RedactionFilter(logging.Filter):
             record.msg = redact_log_message(msg)
             record.args = ()
             extra = {
-                k: v for k, v in record.__dict__.items()
+                k: v
+                for k, v in record.__dict__.items()
                 if k not in _RECORD_ATTRS and not k.startswith("_")
             }
             if extra:
