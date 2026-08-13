@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import UTC, datetime
 
 from concierge_bot.log.redaction import RedactionFilter
 
@@ -34,9 +33,7 @@ def _fmt_val(value: object, limit: int | None = _MAX_VAL) -> str:
 
 class LogfmtFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        ts = datetime.fromtimestamp(record.created, tz=UTC).strftime("%H:%M:%S")
         parts = [
-            f"ts={ts}",
             f"level={record.levelname}",
             f"logger={record.name}",
             f"msg={_fmt_val(record.getMessage(), limit=None)}",
