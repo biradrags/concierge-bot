@@ -9,8 +9,8 @@ from maxo import Dispatcher as MaxDispatcher
 from maxo.transport.long_polling import LongPolling
 
 from concierge_bot.config import get_config
+from concierge_bot.log import setup_logging
 from concierge_bot.maxbot.main_factory import create_max_dishka
-from concierge_bot.utils.log import setup_logging
 
 logger = logging.getLogger(__name__)
 
