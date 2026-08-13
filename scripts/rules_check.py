@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Semantic rule checks that Ruff cannot express. Wired into `make check` + CI.
 
-Canonical source: _devtools/rules_check.py (vendored into each bot's scripts/).
+Canonical source: _infra/bira-scaffold/template/scripts/rules_check.py (this file);
+_devtools/rules_check.py is a generated mirror (`make sync-devtools`).
 Edit here, then re-vendor (`cp`) into each bot AND suppress that bot's own hits -
 suppression comments are per-repo, so do not blind-copy them.
 
