@@ -25,6 +25,8 @@ Checks (id : token : rule):
                      client/AI string. Low precision: suppress verified FP.
   dao-raise        : dao-raise-ok      : `raise` inside dao/ -> DAO returns None,
                      services raise (layer contract).
+  log-setup        : log-setup-ok      : `basicConfig`/`dictConfig`/`colorlog`
+                     outside scripts/ -> use `log.setup_logging()` once at entry.
 
 Usage:  python scripts/rules_check.py [PATH ...]   (default: current dir)
 Exit 1 if any violation is found, 0 otherwise. Stdlib only.
@@ -51,6 +53,11 @@ _BROAD_EXCEPT = re.compile(r"\bexcept\s+BaseException\b")
 _DAO_RAISE = re.compile(r"^\s*raise\b")
 _HTML_FSTR = re.compile(
     r"""f(['"]).*<[a-zA-Z][^>]*>.*\{[^}]+\}.*\1"""
+)
+_LOG_SETUP = (
+    re.compile(r"\blogging\.basicConfig\s*\("),
+    re.compile(r"\blogging\.config\.dictConfig\s*\("),
+    re.compile(r"\bcolorlog\b"),
 )
 
 _SKIP_DIRS = {
@@ -92,6 +99,40 @@ def _html_escape(path: Path, line: str) -> bool:
     return bool(_HTML_FSTR.search(line))
 
 
+def _log_setup_skip(path: Path) -> bool:
+    return "scripts" in path.parts or "tests" in path.parts or path.name.startswith("test_")
+
+
+def _log_setup(path: Path, line: str) -> bool:
+    if _log_setup_skip(path):
+        return False
+    # Закомментированный вызов ничего не настраивает: у solodki-bot и dirty-bot
+    # строка `# logging.basicConfig(...)` пережила миграцию и давала FAIL на
+    # мёртвом коде.
+    if line.lstrip().startswith("#"):
+        return False
+    return any(p.search(line) for p in _LOG_SETUP)
+
+
+def check_log_setup(root: Path) -> list[str]:
+    hits: list[str] = []
+    for p in Path(root).rglob("*.py"):
+        if _SKIP_DIRS & set(p.parts):
+            continue
+        if _log_setup_skip(p):
+            continue
+        try:
+            lines = p.read_text(encoding="utf-8").splitlines()
+        except (UnicodeDecodeError, OSError):
+            continue
+        for i, line in enumerate(lines, 1):
+            if "# log-setup-ok" in line:
+                continue
+            if _log_setup(p, line):
+                hits.append(f"log-setup {p}:{i}: {line.strip()}")
+    return hits
+
+
 # (id, suppress-token, predicate)
 _CHECKS = (
     ("money-float", "money-ok", _money),
@@ -100,6 +141,7 @@ _CHECKS = (
     ("broad-except", "broad-except-ok", _broad_except),
     ("html-escape", "html-escape-ok", _html_escape),
     ("dao-raise", "dao-raise-ok", _dao_raise),
+    ("log-setup", "log-setup-ok", _log_setup),
 )
 
 
