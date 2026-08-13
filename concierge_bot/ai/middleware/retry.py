@@ -65,13 +65,15 @@ class RetryMiddleware(AgentMiddleware):
                         else self._delays[-1]
                     )
                     logger.warning(
-                        "Agent %s retry in %.1fs (%s/%s): %s",
-                        context.agent.name,
-                        delay,
-                        attempt,
-                        self._max_attempts,
-                        e,
-                        extra={"user_id": self._user_id},
+                        "agent call retry",
+                        extra={
+                            "agent": context.agent.name,
+                            "delay_s": round(delay, 1),
+                            "attempt": attempt,
+                            "max_attempts": self._max_attempts,
+                            "err": str(e),
+                            "user_id": self._user_id,
+                        },
                     )
                     await asyncio.sleep(delay)
                 else:

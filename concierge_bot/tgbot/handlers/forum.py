@@ -48,4 +48,12 @@ async def relay_forum_topic_to_guest(
     try:
         await forum.send_to_guest(guest.telegram_user_id, body)
     except Exception:
-        logger.exception("forum relay to guest failed")
+        logger.exception(
+            "forum relay to guest failed",
+            extra={
+                "guest_id": str(guest.id),
+                "hotel_id": str(hotel.id),
+                "chat_id": message.chat.id,
+                "thread_id": tid,
+            },
+        )

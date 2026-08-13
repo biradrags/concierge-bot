@@ -20,9 +20,8 @@ async def on_stale_intent(event: ErrorEvent, bot: Bot) -> bool:
     if cb is None or cb.message is None:
         return True
     logger.info(
-        "Stale intent: dropping chat_id=%s mid=%s",
-        cb.message.chat.id,
-        cb.message.message_id,
+        "stale intent: dropping message",
+        extra={"chat_id": cb.message.chat.id, "mid": cb.message.message_id},
     )
     try:
         await bot.delete_message(chat_id=cb.message.chat.id, message_id=cb.message.message_id)

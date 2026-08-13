@@ -130,7 +130,10 @@ async def on_user_text(
         reply = await concierge.handle_message(hotel, guest, text)
         await bot.send_message(**kw, text=reply, format=TextFormat.HTML)
     except Exception:
-        logger.exception("max concierge message failed")
+        logger.exception(
+            "max concierge message failed",
+            extra={"hotel_id": str(hotel.id), "guest_id": str(guest.id)},
+        )
         await bot.send_message(
             **kw,
             text="Сейчас не получилось ответить. Попробуйте позже.",

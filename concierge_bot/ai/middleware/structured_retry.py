@@ -22,6 +22,13 @@ class StructuredOutputRetryMiddleware(ChatMiddleware):
             except ChatClientInvalidResponseException as e:
                 if attempt >= self._max_retries:
                     raise
-                logger.warning("Structured output retry %s/%s: %s", attempt, self._max_retries, e)
+                logger.warning(
+                    "structured output retry",
+                    extra={
+                        "attempt": attempt,
+                        "max_retries": self._max_retries,
+                        "err": str(e),
+                    },
+                )
             else:
                 return
