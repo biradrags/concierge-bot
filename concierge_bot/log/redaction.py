@@ -183,5 +183,5 @@ class RedactionFilter(logging.Filter):
                 record.__dict__.update(redact_extra(extra))
         except (TypeError, ValueError, AttributeError) as e:
             logger = logging.getLogger(__name__)
-            logger.debug("Redaction filter skipped record: %s", e)
+            logger.debug("redaction filter skipped record", extra={"err": str(e)})
         return True
