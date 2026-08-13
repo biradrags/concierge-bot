@@ -18,7 +18,9 @@ MASK = "***"
 OPENAI_KEY_RE = re.compile(r"sk-[a-zA-Z0-9]{20,}")
 # Токен TG-бота: <bot_id>:<35 символов>. В мультибот-схеме он попадает в путь
 # вебхука (`/webhook/t/<token>`), а оттуда в access-лог.
-TG_TOKEN_RE = re.compile(r"\b\d{6,12}:[A-Za-z0-9_-]{30,}")
+# Без \b слева: в URL вида `/bot8035582859:AAE…` перед цифрами стоит буква, и
+# граница слова там не срабатывает - токен проходил мимо маскировки.
+TG_TOKEN_RE = re.compile(r"\d{6,12}:[A-Za-z0-9_-]{30,}")
 DSN_RE = re.compile(
     r"(?:(?:postgres|mysql|redis|mongodb)(?::\/\/|[^\s,)]+))" r"[^\s,)\]]*",
     re.IGNORECASE,
@@ -94,12 +96,54 @@ def redact(obj: Any) -> Any:
     return obj
 
 
+# Служебные атрибуты LogRecord: их не трогаем, всё остальное в __dict__ - это extra.
+# Снимаем с живого экземпляра, а не списком руками: набор зависит от версии Python.
+_RECORD_ATTRS = frozenset(logging.LogRecord("", 0, "", 0, "", None, None).__dict__) | {
+    "message",
+    "asctime",
+    "taskName",
+}
+
+
+def redact_extra(fields: dict[str, Any]) -> dict[str, Any]:
+    """Прогнать значения extra через маскировку.
+
+    Пока данные жили внутри текста сообщения, их чистил `redact_log_message`.
+    После переноса в `extra={...}` (канон logging.md) они идут мимо: фильтр правил
+    только `record.msg`. Дыра реальная - `extra={"err": str(e)}` легко приносит в
+    логи URL с токеном из текста исключения внешнего клиента.
+
+    Чувствительное имя ключа маскирует значение целиком, остальные строки чистятся
+    по содержимому (sk-ключи, DSN, токен бота). Числа не трогаем: счётчики вроде
+    `input_tokens=15234` - не секрет.
+    """
+    result: dict[str, Any] = {}
+    for key, value in fields.items():
+        if isinstance(value, dict | list):
+            # Вложенный payload (тело запроса, dump ответа) - рекурсивно: секрет
+            # прячется на любой глубине, а не только в плоском поле.
+            result[key] = redact(value)
+        elif not isinstance(value, str) or _is_countable(value):
+            result[key] = value
+        elif _is_sensitive_key(key):
+            result[key] = _mask_value(value)
+        else:
+            result[key] = redact_string(value)
+    return result
+
+
 class RedactionFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         try:
             msg = record.getMessage()
             record.msg = redact_log_message(msg)
             record.args = ()
+            extra = {
+                k: v for k, v in record.__dict__.items()
+                if k not in _RECORD_ATTRS and not k.startswith("_")
+            }
+            if extra:
+                record.__dict__.update(redact_extra(extra))
         except (TypeError, ValueError, AttributeError) as e:
             logger = logging.getLogger(__name__)
             logger.debug("Redaction filter skipped record: %s", e)
