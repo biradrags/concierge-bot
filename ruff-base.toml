@@ -1,8 +1,11 @@
-# Canonical Ruff config for all bira bots (source of truth).
+# Canonical Ruff config for all bira bots.
+# SOURCE OF TRUTH: _infra/bira-scaffold/template/ruff-base.toml (this file).
+# _devtools/ruff-base.toml - generated mirror (`make sync-devtools` in bira-scaffold).
 #
 # Each bot is a SEPARATE git repo, so this file is VENDORED (copied) into each
 # project root and extended locally - cross-repo `extend` would break in CI/Docker
-# where only the bot's own repo is checked out.
+# where only the bot's own repo is checked out. New projects get it from copier;
+# existing repos re-vendor on touch.
 #
 # In a bot's pyproject.toml:
 #   [tool.ruff]
