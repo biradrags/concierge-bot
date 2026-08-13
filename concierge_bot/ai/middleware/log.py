@@ -29,9 +29,11 @@ class LoggingMiddleware(AgentMiddleware):
 
     async def _log_start(self, ctx: AgentContext) -> None:
         logger.debug(
-            "agent=%s session=%s",
-            ctx.agent.name,
-            ctx.session.session_id if ctx.session else None,
+            "agent start",
+            extra={
+                "agent": ctx.agent.name,
+                "session_id": ctx.session.session_id if ctx.session else None,
+            },
         )
         instructions = (ctx.agent.default_options or {}).get("instructions")
         if instructions and logger.isEnabledFor(logging.DEBUG):
@@ -57,17 +59,22 @@ class LoggingMiddleware(AgentMiddleware):
         payload_kb = payload_bytes / 1024
         if payload_bytes > PAYLOAD_WARN_BYTES:
             logger.warning(
-                "large_llm_payload_kb=%.1f messages=%d agent=%s session=%s",
-                payload_kb,
-                total_for_llm,
-                ctx.agent.name,
-                ctx.session.session_id if ctx.session else None,
+                "large llm payload",
+                extra={
+                    "payload_kb": round(payload_kb, 1),
+                    "messages": total_for_llm,
+                    "agent": ctx.agent.name,
+                    "session_id": ctx.session.session_id if ctx.session else None,
+                },
             )
         else:
-            logger.debug("payload_kb=%.1f messages=%d", payload_kb, total_for_llm)
+            logger.debug(
+                "llm payload",
+                extra={"payload_kb": round(payload_kb, 1), "messages": total_for_llm},
+            )
 
     async def _log_complete(self, ctx: AgentContext) -> None:
-        logger.debug("agent_done=%s", ctx.agent.name)
+        logger.debug("agent done", extra={"agent": ctx.agent.name})
         if ctx.result and logger.isEnabledFor(logging.DEBUG):
             text = getattr(ctx.result, "text", None) or str(ctx.result)
             self._log_response_text(text)

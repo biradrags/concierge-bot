@@ -95,7 +95,10 @@ def sanitize_messages(messages: list[Message]) -> list[Message]:
             sanitized.append(msg)
 
     if skipped_tool > 0:
-        logger.info("Sanitized %d orphaned TOOL messages from history", skipped_tool)
+        logger.info(
+            "history: orphaned tool messages sanitized",
+            extra={"skipped_tool": skipped_tool},
+        )
 
     # Последнее сообщение: function_calls без tool-ответов.
     # По умолчанию НЕ стрипаем — они нужны для approval flow.
@@ -113,8 +116,8 @@ def sanitize_messages(messages: list[Message]) -> list[Message]:
 
     if stripped_fc > 0:
         logger.info(
-            "Sanitized dangling function_call(s) from %d assistant message(s) in history",
-            stripped_fc,
+            "history: dangling function calls stripped",
+            extra={"stripped_fc": stripped_fc},
         )
 
     return sanitized
@@ -222,10 +225,12 @@ def _trim_by_turns(
     removed = len(messages) - len(trimmed)
     if removed > 0:
         logger.info(
-            "Message store: trimmed history_turns=%s max_messages=%s, removed %s messages",
-            history_turns,
-            max_messages,
-            removed,
+            "history: trimmed",
+            extra={
+                "history_turns": history_turns,
+                "max_messages": max_messages,
+                "removed": removed,
+            },
         )
     return trimmed
 

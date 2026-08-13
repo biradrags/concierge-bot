@@ -33,7 +33,10 @@ class ConciergeRedisHistoryProvider(RedisHistoryProvider):
         normalized = _normalize_messages_for_openai(sanitized)
         trimmed = _trim_by_turns(normalized, HISTORY_TURNS, self.max_messages)
         if trimmed and logger.isEnabledFor(logging.DEBUG):
-            logger.debug("concierge history session=%s count=%s", session_id, len(trimmed))
+            logger.debug(
+                "concierge history loaded",
+                extra={"session_id": session_id, "count": len(trimmed)},
+            )
         return trimmed
 
     async def save_messages(
