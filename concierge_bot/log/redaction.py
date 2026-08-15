@@ -51,8 +51,12 @@ OPENAI_KEY_RE = re.compile(r"sk-[a-zA-Z0-9]{20,}")
 # Без \b слева: в URL вида `/bot8035582859:AAE…` перед цифрами стоит буква, и
 # граница слова там не срабатывает - токен проходил мимо маскировки.
 TG_TOKEN_RE = re.compile(r"\d{6,12}:[A-Za-z0-9_-]{30,}")
+# Схема DSN: имя СУБД + необязательный драйверный суффикс (postgresql+asyncpg,
+# redis+sentinel) и ОБЯЗАТЕЛЬНЫЙ `://`. Без требования разделителя вторая
+# альтернатива съедала обычный текст, начинающийся с имени СУБД: `redis_reconnect
+# ok` уезжал в лог как `redi***nect ok`, `postgres_pool_size=10` - так же.
 DSN_RE = re.compile(
-    r"(?:(?:postgres|mysql|redis|mongodb)(?::\/\/|[^\s,)]+))" r"[^\s,)\]]*",
+    r"(?:postgresql|postgres|mysql|rediss|redis|mongodb)(?:\+[a-z0-9]+)?://[^\s,)\]]*",
     re.IGNORECASE,
 )
 
@@ -86,35 +90,48 @@ def _is_countable(value: str) -> bool:
     return value.isdigit() or (value.replace(".", "", 1).isdigit() and "." in value)
 
 
+def _keep_as_is(match: re.Match[str]) -> bool:
+    """Счётчик или доменное поле, лишь похожее на секрет по основе имени."""
+    return _is_countable(match.group(2)) or not _is_sensitive_key(
+        match.group(1).split("=")[0].strip()
+    )
+
+
+def _sub_bare(match: re.Match[str]) -> str:
+    if _keep_as_is(match):
+        return match.group(0)
+    return match.group(1) + _mask_value(match.group(2))
+
+
+def _sub_quoted(match: re.Match[str]) -> str:
+    if _keep_as_is(match):
+        return match.group(0)
+    return match.group(1) + "'" + _mask_value(match.group(2)) + "'"
+
+
+# Пары (голый, закавыченный) паттернов на каждую основу. Компилируются ОДИН раз
+# при импорте: фильтр висит на root-хендлере, и сборка паттернов внутри функции
+# гоняла 12 re.compile на КАЖДОЙ строке лога.
+_KV_PATTERNS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = tuple(
+    (
+        re.compile(
+            r"(\b\w*" + re.escape(part) + r"\w*\s*=\s*)([^\s,)\]}\']+)",
+            re.IGNORECASE,
+        ),
+        re.compile(
+            r"(\b\w*" + re.escape(part) + r"\w*\s*=\s*)[\'\"]([^\'\"]+)[\'\"]",
+            re.IGNORECASE,
+        ),
+    )
+    for part in SENSITIVE_KEY_PATTERNS
+)
+
+
 def redact_log_message(text: str) -> str:
     text = redact_string(text)
-    for key_part in SENSITIVE_KEY_PATTERNS:
-        pattern = re.compile(
-            r"(\b\w*" + re.escape(key_part) + r"\w*\s*=\s*)" r"([^\s,)\]}\']+)",
-            re.IGNORECASE,
-        )
-        text = pattern.sub(
-            lambda m: (
-                m.group(0)
-                if _is_countable(m.group(2))
-                or not _is_sensitive_key(m.group(1).split("=")[0].strip())
-                else m.group(1) + _mask_value(m.group(2))
-            ),
-            text,
-        )
-        quoted = re.compile(
-            r"(\b\w*" + re.escape(key_part) + r"\w*\s*=\s*)" r"[\'\"]([^\'\"]+)[\'\"]",
-            re.IGNORECASE,
-        )
-        text = quoted.sub(
-            lambda m: (
-                m.group(0)
-                if _is_countable(m.group(2))
-                or not _is_sensitive_key(m.group(1).split("=")[0].strip())
-                else m.group(1) + "'" + _mask_value(m.group(2)) + "'"
-            ),
-            text,
-        )
+    for bare, quoted in _KV_PATTERNS:
+        text = bare.sub(_sub_bare, text)
+        text = quoted.sub(_sub_quoted, text)
     return text
 
 
@@ -134,7 +151,11 @@ def redact(obj: Any) -> Any:
 
 # Служебные атрибуты LogRecord: их не трогаем, всё остальное в __dict__ - это extra.
 # Снимаем с живого экземпляра, а не списком руками: набор зависит от версии Python.
-_RECORD_ATTRS = frozenset(logging.LogRecord("", 0, "", 0, "", None, None).__dict__) | {
+#
+# ПУБЛИЧНОЕ имя: тот же набор нужен форматтеру (`log/__init__.py`), и это ОДНА
+# граница «что считается полем extra» - разъехавшись, маскировка и формат начнут
+# спорить о том, печатать ли поле. Держим в одном месте, импортируем.
+RECORD_ATTRS = frozenset(logging.LogRecord("", 0, "", 0, "", None, None).__dict__) | {
     "message",
     "asctime",
     "taskName",
@@ -159,10 +180,14 @@ def redact_extra(fields: dict[str, Any]) -> dict[str, Any]:
             # Вложенный payload (тело запроса, dump ответа) - рекурсивно: секрет
             # прячется на любой глубине, а не только в плоском поле.
             result[key] = redact(value)
+        elif _is_sensitive_key(key):
+            # Имя ключа решает РАНЬШЕ типа значения. Когда ветка «не строка»
+            # стояла выше, bytes-токен и числовой пароль уходили в лог целиком,
+            # то есть плоское поле было защищено хуже вложенного (redact() ниже
+            # маскирует по имени ключа независимо от типа).
+            result[key] = _mask_value(str(value))
         elif not isinstance(value, str) or _is_countable(value):
             result[key] = value
-        elif _is_sensitive_key(key):
-            result[key] = _mask_value(value)
         else:
             result[key] = redact_string(value)
     return result
@@ -177,7 +202,7 @@ class RedactionFilter(logging.Filter):
             extra = {
                 k: v
                 for k, v in record.__dict__.items()
-                if k not in _RECORD_ATTRS and not k.startswith("_")
+                if k not in RECORD_ATTRS and not k.startswith("_")
             }
             if extra:
                 record.__dict__.update(redact_extra(extra))
