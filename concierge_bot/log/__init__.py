@@ -5,13 +5,17 @@ from __future__ import annotations
 import logging
 import os
 
-from concierge_bot.log.redaction import RedactionFilter
+from concierge_bot.log.redaction import RECORD_ATTRS, RedactionFilter
 
-_STD_ATTRS = frozenset(logging.LogRecord("", 0, "", 0, "", None, None).__dict__) | {
-    "message",
-    "asctime",
-    "taskName",
-}
+# Имена, которые формат занимает под себя: поле extra с таким именем дало бы в
+# строке второй `level=`, а `unpack_logfmt` берёт ПОСЛЕДНЕЕ значение ключа.
+_RESERVED_KEYS = frozenset({"level", "logger", "msg", "exc", "stack"})
+
+
+def _safe_key(key: str) -> str:
+    """Имя поля extra, не спорящее с зарезервированными ключами формата."""
+    return f"{key}_" if key in _RESERVED_KEYS else key
+
 
 _MAX_VAL = 120
 
@@ -39,9 +43,9 @@ class LogfmtFormatter(logging.Formatter):
             f"msg={_fmt_val(record.getMessage(), limit=None)}",
         ]
         parts += [
-            f"{key}={_fmt_val(value)}"
+            f"{_safe_key(key)}={_fmt_val(value)}"
             for key, value in record.__dict__.items()
-            if key not in _STD_ATTRS and not key.startswith("_")
+            if key not in RECORD_ATTRS and not key.startswith("_")
         ]
         if record.exc_info:
             parts.append(
@@ -76,5 +80,5 @@ def setup_logging(level: str | int | None = None) -> None:
     root.addHandler(handler)
     root.setLevel(level)
     logging.getLogger("aiohttp.access").addFilter(_ProbeAccessFilter())
-    for noisy in ("aiogram.event", "aiohttp.access", "sqlalchemy.engine", "httpx"):
+    for noisy in ("aiogram.event", "sqlalchemy.engine", "httpx"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
