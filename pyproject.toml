@@ -17,7 +17,7 @@ dependencies = [
     "pydantic>=2.10.6,<2.12.0",
     "pydantic-settings>=2.9.0,<3.0",
     "python-dotenv>=1.0.1,<2.0",
-    "SQLAlchemy>=2.0.25,<3.0",
+    "SQLAlchemy>=2.0.25,<2.1",
     "aiohttp>=3.9.5,<4.0",
     "dishka>=1.3.0,<2.0",
     "greenlet>=3.2.0,<4.0",
@@ -61,4 +61,4 @@ extend = "ruff-base.toml"
 "scripts/**/*.py" = ["ANN", "ARG", "BLE", "S", "E741", "DTZ", "B904"]
 
 [tool.uv]
-prerelease = "allow"
+prerelease = "if-necessary-or-explicit"
