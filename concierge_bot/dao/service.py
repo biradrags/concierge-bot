@@ -48,7 +48,7 @@ class ServiceDao(BaseDAO[Service]):
         return [ServiceDTO.model_validate(r) for r in result.all()]
 
     async def create(self, **kwargs: object) -> ServiceDTO:
-        service = Service(**kwargs)  # type: ignore[arg-type]
+        service = Service(**kwargs)
         self._save(service)
         await self._flush()
         return ServiceDTO.model_validate(service)

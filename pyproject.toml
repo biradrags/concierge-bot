@@ -26,6 +26,7 @@ dependencies = [
     "agent-framework>=1.4.0,<1.5",
     "agent-framework-openai>=1.4.0,<1.5",
     "agent-framework-redis>=1.0.0b260319,<2.0",
+    "bira-core @ git+https://github.com/biradrags/bira-core@v0.3.3",
 ]
 
 [project.optional-dependencies]
