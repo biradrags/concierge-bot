@@ -57,14 +57,20 @@ class DevelopmentConfig(BaseConfig):
 
 
 def get_config() -> BaseConfig:
-    env = os.environ.get("APP_ENV", "development").lower()
-    if env not in ("development", "dev", "production", "prod"):
-        env = "development"
+    env = _AppEnvSelector().app_env
     logger.debug("Loading configuration for environment: %s", env)
-    mapping: dict[str, type[BaseConfig]] = {
+    mapping: dict[AppEnv, type[BaseConfig]] = {
         "production": ProductionConfig,
         "prod": ProductionConfig,
         "development": DevelopmentConfig,
         "dev": DevelopmentConfig,
     }
     return mapping[env]()
+
+
+class _AppEnvSelector(BaseSettings):
+    """Только APP_ENV, через BaseSettings: из os.environ значение из .env молча теряется."""
+
+    model_config = BaseConfig.model_config
+
+    app_env: AppEnv = "development"
