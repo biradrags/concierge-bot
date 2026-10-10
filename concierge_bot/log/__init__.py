@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import os
 
-from concierge_bot.log.redaction import RECORD_ATTRS, RedactionFilter
+from bira_core.log.redaction import RECORD_ATTRS, RedactionFilter
 
 # Имена, которые формат занимает под себя: поле extra с таким именем дало бы в
 # строке второй `level=`, а `unpack_logfmt` берёт ПОСЛЕДНЕЕ значение ключа.
