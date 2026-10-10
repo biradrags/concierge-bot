@@ -77,7 +77,6 @@ typecheck: ## Mypy
 	uv run mypy concierge_bot
 
 rules-check: ## Semantic rule checks not expressible in Ruff (money=Decimal)
-	@echo "🔍 Running rules_check..."
-	uv run python scripts/rules_check.py concierge_bot
+	uv run bira-rules-check concierge_bot
 
 check: lint rules-check test ## Lint + rules + tests (no typecheck until codebase stabilizes)

@@ -45,7 +45,7 @@ class HotelDao(BaseDAO[Hotel]):
         return HotelDTO.model_validate(row) if row else None
 
     async def create(self, **kwargs: object) -> HotelDTO:
-        hotel = Hotel(**kwargs)  # type: ignore[arg-type]
+        hotel = Hotel(**kwargs)
         self._save(hotel)
         await self._flush()
         return HotelDTO.model_validate(hotel)
