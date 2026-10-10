@@ -727,6 +727,7 @@ dependencies = [
     { name = "aiohttp" },
     { name = "alembic" },
     { name = "asyncpg" },
+    { name = "bira-core" },
     { name = "dishka" },
     { name = "greenlet" },
     { name = "maxo", extra = ["dishka"] },
@@ -760,6 +761,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.9.5,<4.0" },
     { name = "alembic", specifier = ">=1.13.3,<2.0" },
     { name = "asyncpg", specifier = ">=0.29.0,<0.30.0" },
+    { name = "bira-core", git = "https://github.com/biradrags/bira-core?rev=v0.3.3" },
     { name = "dishka", specifier = ">=1.3.0,<2.0" },
     { name = "greenlet", specifier = ">=3.2.0,<4.0" },
     { name = "maxo", extras = ["dishka"], specifier = ">=0.5.0" },
@@ -777,6 +779,14 @@ requires-dist = [
     { name = "sqlalchemy", specifier = ">=2.0.25,<2.1" },
 ]
 provides-extras = ["test", "lint"]
+
+[[package]]
+name = "bira-core"
+version = "0.3.3"
+source = { git = "https://github.com/biradrags/bira-core?rev=v0.3.3#ef2b8d9d227add8e33fcd1f808bf3631dff1ce4a" }
+dependencies = [
+    { name = "aiohttp" },
+]
 
 [[package]]
 name = "boto3"
