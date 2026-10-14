@@ -1,6 +1,5 @@
 from aiogram import Bot, F, Router
 from aiogram.types import Message
-from dishka.integrations.aiogram import FromDishka, inject
 
 from concierge_bot.dao import HolderDao
 from concierge_bot.services.concierge import ConciergeService
@@ -10,13 +9,12 @@ router = Router(name="message")
 
 
 @router.message(F.text, ~F.text.startswith("/"))
-@inject
 async def on_guest_text(
     message: Message,
     bot: Bot,
-    dao: FromDishka[HolderDao],
-    guest_service: FromDishka[GuestService],
-    concierge: FromDishka[ConciergeService],
+    dao: HolderDao,
+    guest_service: GuestService,
+    concierge: ConciergeService,
 ) -> None:
     if message.chat.type != "private" or not message.text or message.from_user is None:
         return
