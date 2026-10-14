@@ -4,11 +4,8 @@ from typing import Any
 from aiogram import BaseMiddleware, Bot
 from aiogram.enums import ChatType
 from aiogram.types import CallbackQuery, Message, TelegramObject
-from dishka import AsyncContainer
-from dishka.integrations.aiogram import CONTAINER_NAME
 
 from concierge_bot.dao import HolderDao
-from concierge_bot.services.booking import BookingService
 from concierge_bot.services.guest import GuestService
 
 
@@ -37,16 +34,12 @@ class ConciergeDataMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: dict[str, Any],
     ) -> Any:
-        container: AsyncContainer = data[CONTAINER_NAME]
-        dao = await container.get(HolderDao)
-        bot = await container.get(Bot)
-        booking_service = await container.get(BookingService)
-        guest_service = await container.get(GuestService)
+        dao: HolderDao = data["dao"]
+        bot: Bot = data["bot"]
+        guest_service: GuestService = data["guest_service"]
 
         hotel = await dao.hotel.get_by_bot_token(bot.token)
         data["hotel"] = hotel
-        data["dao"] = dao
-        data["booking_service"] = booking_service
 
         guest = None
         is_admin = False
