@@ -5,7 +5,6 @@ from aiogram import F, Router
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery
-from dishka.integrations.aiogram import FromDishka, inject
 
 from concierge_bot.dao import HolderDao
 from concierge_bot.services.booking import BookingService
@@ -14,11 +13,10 @@ router = Router(name="booking_callback")
 
 
 @router.callback_query(F.data.startswith("bk:"))
-@inject
 async def on_booking_decision(
     query: CallbackQuery,
-    booking_service: FromDishka[BookingService],
-    dao: FromDishka[HolderDao],
+    booking_service: BookingService,
+    dao: HolderDao,
 ) -> None:
     if not query.data or not query.message:
         return
