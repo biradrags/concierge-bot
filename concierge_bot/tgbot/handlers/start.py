@@ -3,7 +3,6 @@ import html
 from aiogram import Bot, Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
-from dishka.integrations.aiogram import FromDishka, inject
 
 from concierge_bot.dao import HolderDao
 from concierge_bot.services.forum import ForumService
@@ -13,13 +12,12 @@ router = Router(name="start")
 
 
 @router.message(CommandStart())
-@inject
 async def cmd_start(
     message: Message,
     bot: Bot,
-    dao: FromDishka[HolderDao],
-    guest_service: FromDishka[GuestService],
-    forum: FromDishka[ForumService],
+    dao: HolderDao,
+    guest_service: GuestService,
+    forum: ForumService,
 ) -> None:
     hotel = await dao.hotel.get_by_bot_token(bot.token)
     if hotel is None:

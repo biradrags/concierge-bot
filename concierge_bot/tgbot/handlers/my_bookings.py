@@ -3,7 +3,6 @@ import html
 from aiogram import Bot, Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from dishka.integrations.aiogram import FromDishka, inject
 
 from concierge_bot.dao import HolderDao
 from concierge_bot.services.guest import GuestService
@@ -18,12 +17,11 @@ _STATUS_EMOJI = {
 
 
 @router.message(Command("mybookings"))
-@inject
 async def cmd_mybookings(
     message: Message,
-    bot: FromDishka[Bot],
-    dao: FromDishka[HolderDao],
-    guest_service: FromDishka[GuestService],
+    bot: Bot,
+    dao: HolderDao,
+    guest_service: GuestService,
 ) -> None:
     if message.chat.type != "private" or message.from_user is None:
         return

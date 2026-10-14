@@ -4,7 +4,6 @@ import logging
 from aiogram import Bot, F, Router
 from aiogram.enums import ChatType
 from aiogram.types import Message
-from dishka.integrations.aiogram import FromDishka, inject
 
 from concierge_bot.dao import HolderDao
 from concierge_bot.services.forum import ForumService
@@ -20,12 +19,11 @@ router = Router(name="forum")
     F.text,
     ~F.text.startswith("/"),
 )
-@inject
 async def relay_forum_topic_to_guest(
     message: Message,
     bot: Bot,
-    dao: FromDishka[HolderDao],
-    forum: FromDishka[ForumService],
+    dao: HolderDao,
+    forum: ForumService,
 ) -> None:
     if not message.text or message.from_user is None or message.from_user.is_bot:
         return
