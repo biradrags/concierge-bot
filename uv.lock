@@ -768,7 +768,7 @@ requires-dist = [
     { name = "bira-core", git = "https://github.com/biradrags/bira-core?rev=v0.3.3" },
     { name = "dishka", specifier = ">=1.10.1,<2.0" },
     { name = "greenlet", specifier = ">=3.2.0,<4.0" },
-    { name = "maxo", extras = ["dishka"], specifier = ">=0.5.0" },
+    { name = "maxo", extras = ["dishka"], specifier = ">=0.9.0,<1.0" },
     { name = "mypy", marker = "extra == 'lint'", specifier = ">=1.13.0,<2.0" },
     { name = "psycopg", specifier = ">=3.2.3,<4.0" },
     { name = "psycopg-binary", specifier = ">=3.2.3,<4.0" },
