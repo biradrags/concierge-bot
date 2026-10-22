@@ -47,7 +47,7 @@ def make_redis_client(
         retry=Retry(
             ExponentialBackoff(cap=2, base=0.1),
             retries=retry_attempts,
-            supported_errors=_RECONNECT_ERRORS,
+            supported_errors=_RECONNECT_ERRORS,  # type: ignore[arg-type]  # redis-py типизирует supported_errors как RedisError-наследников
         ),
         retry_on_error=list(_RECONNECT_ERRORS),
     )

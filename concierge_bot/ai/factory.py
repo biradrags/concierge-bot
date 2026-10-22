@@ -20,7 +20,6 @@ def create_agent(
     max_tokens: int = 2048,
     middleware: list[Any] | None = None,
     context_providers: list[Any] | None = None,
-    max_iterations: int = 8,
     temperature: float = 0.3,
     reasoning_effort: str = "low",
 ) -> Agent:
@@ -36,7 +35,9 @@ def create_agent(
     else:
         options["temperature"] = temperature
 
-    agent = client.as_agent(
+    # max_iterations живёт на клиенте (client.function_invocation_configuration),
+    # у Agent такого атрибута нет - присваивание сюда ничего не настраивало.
+    return client.as_agent(
         name=name,
         instructions=prompt,
         tools=tools or [],
@@ -44,8 +45,3 @@ def create_agent(
         middleware=middleware or [],
         context_providers=context_providers or [],
     )
-    agent.function_invocation_configuration = {
-        "max_iterations": max_iterations,
-        "max_consecutive_errors_per_request": 2,
-    }
-    return agent
