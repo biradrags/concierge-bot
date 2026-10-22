@@ -56,10 +56,9 @@ async def run_async_migrations() -> None:
     await connectable.dispose()
 
 
-def run_migrations_sync() -> None:
+def run_migrations_sync(url: str) -> None:
     from sqlalchemy import create_engine
 
-    url = config.get_main_option("sqlalchemy.url")
     engine = create_engine(url, poolclass=pool.NullPool)
 
     with engine.connect() as connection:
@@ -71,7 +70,7 @@ def run_migrations_sync() -> None:
 def run_migrations_online() -> None:
     url = config.get_main_option("sqlalchemy.url")
     if url and "+asyncpg" not in url:
-        run_migrations_sync()
+        run_migrations_sync(url)
     else:
         asyncio.run(run_async_migrations())
 

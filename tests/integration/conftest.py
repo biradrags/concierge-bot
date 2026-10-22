@@ -21,11 +21,10 @@ async def db_engine():  # noqa: ANN201
     try:
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
-    except OSError as exc:
-        await engine.dispose()
-        pytest.skip(f"PostgreSQL unavailable ({exc})")
     except Exception as exc:  # noqa: BLE001
         await engine.dispose()
+        if os.environ.get("CI"):
+            pytest.fail(f"PostgreSQL unavailable in CI ({exc})")
         pytest.skip(f"PostgreSQL unavailable ({exc})")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

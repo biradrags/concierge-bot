@@ -1,5 +1,6 @@
 import logging
 
+from agent_framework import Agent
 from agent_framework.openai import OpenAIChatClient
 from aiogram import Bot
 
@@ -32,7 +33,7 @@ def create_concierge_agent(
     booking_service: BookingService,
     bot: Bot,
     history_provider: ConciergeRedisHistoryProvider,
-) -> tuple[object, ToolDeps, ConciergeState]:
+) -> tuple[Agent, ToolDeps, ConciergeState]:
     deps = ToolDeps(
         hotel=hotel,
         guest=guest,
@@ -95,4 +96,7 @@ async def run_concierge_agent(
             return ConciergeResponse(
                 message="Нужно подтверждение в интерфейсе — отправьте запрос проще или повторите.",
             )
+        if not isinstance(result.value, ConciergeResponse):
+            msg = "concierge agent returned no structured response"
+            raise TypeError(msg)
         return result.value

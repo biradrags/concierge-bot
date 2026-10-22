@@ -17,6 +17,7 @@ def mock_holder_dao() -> MagicMock:
     dao.service = MagicMock()
     dao.booking = MagicMock()
     dao.guest = MagicMock()
+    dao.commit = AsyncMock()
     return dao
 
 

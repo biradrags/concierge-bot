@@ -46,6 +46,7 @@ async def cmd_start(
         language_code=lang,
     )
     if hotel.forum_chat_id is not None and guest.forum_topic_id is None:
+        await dao.commit()  # D5: гость записан до Telegram-вызова, транзакция не висит через него
         topic_id = await forum.create_topic(
             hotel.forum_chat_id,
             (message.from_user.full_name or str(message.from_user.id))[:120],
