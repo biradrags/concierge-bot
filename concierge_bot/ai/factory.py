@@ -35,8 +35,7 @@ def create_agent(
     else:
         options["temperature"] = temperature
 
-    # max_iterations живёт на клиенте (client.function_invocation_configuration),
-    # у Agent такого атрибута нет - присваивание сюда ничего не настраивало.
+    # лимит tool-loop задаётся на клиенте (client.function_invocation_configuration), не на Agent
     return client.as_agent(
         name=name,
         instructions=prompt,
