@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.interfaces import ORMOption
 
@@ -40,13 +40,6 @@ class BaseDAO[Model_co: Base]:
 
     async def _delete(self, obj: Base) -> None:
         await self.session.delete(obj)
-
-    async def _delete_by_id(self, id_: UUID) -> None:
-        await self.session.execute(delete(self.model).where(self.model.__table__.c.id == id_))
-
-    async def count(self) -> int:
-        result = await self.session.execute(select(func.count(self.model.__table__.c.id)))
-        return int(result.scalar_one())
 
     async def commit(self) -> None:
         await self.session.commit()

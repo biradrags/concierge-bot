@@ -1,7 +1,8 @@
 import html
+from contextlib import suppress
 from uuid import UUID
 
-from aiogram import F, Router
+from aiogram import Bot, F, Router
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, Message
@@ -10,13 +11,19 @@ from concierge_bot.services.booking import BookingService
 
 router = Router(name="booking_callback")
 
+_STATUS_RU = {"confirmed": "подтверждена", "cancelled": "отклонена"}
+
 
 @router.callback_query(F.data.startswith("bk:"))
 async def on_booking_decision(
     query: CallbackQuery,
     booking_service: BookingService,
+    bot: Bot,
 ) -> None:
-    if not query.data or not query.message:
+    if not query.data:
+        return
+    if not query.message:
+        await query.answer("Сообщение недоступно. Откройте бронь через /admin.", show_alert=True)
         return
     parts = query.data.split(":")
     if len(parts) != 3:
@@ -30,19 +37,23 @@ async def on_booking_decision(
         return
     try:
         if action == "ok":
-            await booking_service.confirm_booking(booking_id)
+            booking = await booking_service.confirm_booking(booking_id)
         else:
-            await booking_service.cancel_booking(booking_id)
+            booking = await booking_service.cancel_booking(booking_id)
     except ValueError as e:
         await query.answer(str(e), show_alert=True)
         return
-    await query.answer("Готово")
     message = query.message
-    # старше 48 ч сообщение приходит как InaccessibleMessage - править его нельзя
+    # старше 48 ч сообщение приходит как InaccessibleMessage: клавиатуру снимаем через bot (dialogs.md, stale-intent)
     if not isinstance(message, Message):
+        with suppress(TelegramBadRequest):
+            await bot.edit_message_reply_markup(chat_id=message.chat.id, message_id=message.message_id, reply_markup=None)
+        await query.answer("Бронь обработана. Сообщение устарело, откройте её заново.", show_alert=True)
         return
+    await query.answer("Готово")
     base = message.text or message.caption or ""
-    status_ru = "подтверждена" if action == "ok" else "отклонена"
+    # статус берём из брони: уже решённая раньше бронь не меняется, кнопка могла быть устаревшей
+    status_ru = _STATUS_RU.get(booking.status, booking.status)
     suffix = f"\n\n<b>Статус:</b> {html.escape(status_ru)}"
     try:
         if message.text is not None:
