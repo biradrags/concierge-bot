@@ -5,8 +5,7 @@ from maxo.integrations.dishka import CONTAINER_NAME
 from maxo.omit import is_defined
 from maxo.routing.ctx import Ctx
 from maxo.routing.interfaces.middleware import BaseMiddleware, NextMiddleware
-from maxo.routing.updates.bot_started import BotStarted
-from maxo.routing.updates.message_created import MessageCreated
+from maxo.types import BotStarted, MessageCreated
 
 from concierge_bot.dao import HolderDao
 from concierge_bot.services.guest import GuestService
