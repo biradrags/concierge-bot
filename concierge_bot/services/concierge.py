@@ -38,6 +38,8 @@ class ConciergeService:
         if not (self._config.openai_api_key or "").strip():
             return "Консьерж недоступен: задайте OPENAI_API_KEY в окружении."
         try:
+            # eager release: читающая/гостевая транзакция не должна висеть через LLM-вызов (idle_in_transaction 60 с)
+            await self._dao.commit()
             response = await run_concierge_agent(
                 client=self._client,
                 config=self._config,

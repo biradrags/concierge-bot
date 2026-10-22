@@ -49,5 +49,4 @@ async def on_book(
         hotel=hotel,
         notes=None,
     )
-    await manager.middleware_data["dao"].commit()
     await manager.switch_to(GuestServicesSG.booked)

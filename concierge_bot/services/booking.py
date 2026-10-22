@@ -33,6 +33,8 @@ class BookingService:
             service_id=service_id,
             notes=notes,
         )
+        # записи -> commit -> отправки (D5): Telegram не держит транзакцию и не врёт при откате
+        await self._dao.commit()
         await self._notification.notify_admin(hotel, booking, service, guest)
         if (
             hotel.forum_chat_id is not None
@@ -64,6 +66,7 @@ class BookingService:
             msg = "Guest not found for booking"
             raise ValueError(msg)
         updated = await self._dao.booking.update_status(booking_id, status)
+        await self._dao.commit()  # D5: commit до отправки гостю
         await self._notification.notify_guest(guest, updated, status)
         return updated
 

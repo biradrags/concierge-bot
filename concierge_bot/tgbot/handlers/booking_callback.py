@@ -6,7 +6,6 @@ from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, Message
 
-from concierge_bot.dao import HolderDao
 from concierge_bot.services.booking import BookingService
 
 router = Router(name="booking_callback")
@@ -16,7 +15,6 @@ router = Router(name="booking_callback")
 async def on_booking_decision(
     query: CallbackQuery,
     booking_service: BookingService,
-    dao: HolderDao,
 ) -> None:
     if not query.data or not query.message:
         return
@@ -35,7 +33,6 @@ async def on_booking_decision(
             await booking_service.confirm_booking(booking_id)
         else:
             await booking_service.cancel_booking(booking_id)
-        await dao.commit()
     except ValueError as e:
         await query.answer(str(e), show_alert=True)
         return
