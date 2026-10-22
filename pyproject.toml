@@ -46,6 +46,7 @@ include = ["concierge_bot*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = ["integration: нужен PostgreSQL (make docker-up)"]
 
 [tool.mypy]
 python_version = "3.12"
