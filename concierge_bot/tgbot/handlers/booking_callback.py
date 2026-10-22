@@ -1,7 +1,8 @@
 import html
+from contextlib import suppress
 from uuid import UUID
 
-from aiogram import F, Router
+from aiogram import Bot, F, Router
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, Message
@@ -15,11 +16,12 @@ router = Router(name="booking_callback")
 async def on_booking_decision(
     query: CallbackQuery,
     booking_service: BookingService,
+    bot: Bot,
 ) -> None:
     if not query.data:
         return
     if not query.message:
-        await query.answer("Сообщение устарело", show_alert=True)
+        await query.answer("Сообщение недоступно. Откройте бронь через /admin.", show_alert=True)
         return
     parts = query.data.split(":")
     if len(parts) != 3:
@@ -40,9 +42,11 @@ async def on_booking_decision(
         await query.answer(str(e), show_alert=True)
         return
     message = query.message
-    # старше 48 ч сообщение приходит как InaccessibleMessage: клавиатуру не снять, решение уже применено
+    # старше 48 ч сообщение приходит как InaccessibleMessage: клавиатуру снимаем через bot (dialogs.md, stale-intent)
     if not isinstance(message, Message):
-        await query.answer("Статус брони обновлён. Сообщение устарело, откройте бронь заново.", show_alert=True)
+        with suppress(TelegramBadRequest):
+            await bot.edit_message_reply_markup(chat_id=message.chat.id, message_id=message.message_id, reply_markup=None)
+        await query.answer("Бронь обработана. Сообщение устарело, откройте её заново.", show_alert=True)
         return
     await query.answer("Готово")
     base = message.text or message.caption or ""
