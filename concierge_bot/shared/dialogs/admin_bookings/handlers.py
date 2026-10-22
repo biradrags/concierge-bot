@@ -28,7 +28,6 @@ async def on_confirm_booking(
     raw = manager.dialog_data.get("booking_id")
     if raw:
         await booking_service.confirm_booking(UUID(raw))
-        await manager.middleware_data["dao"].commit()
     await manager.switch_to(AdminBookingsSG.list)
 
 
@@ -41,5 +40,4 @@ async def on_cancel_booking(
     raw = manager.dialog_data.get("booking_id")
     if raw:
         await booking_service.cancel_booking(UUID(raw))
-        await manager.middleware_data["dao"].commit()
     await manager.switch_to(AdminBookingsSG.list)
