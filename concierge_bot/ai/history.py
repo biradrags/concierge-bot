@@ -57,6 +57,7 @@ def build_concierge_history_provider(config: BaseConfig) -> ConciergeRedisHistor
         source_id="redis_concierge_memory",
         redis_url=config.redis_url,
         key_prefix=KEY_PREFIX,
+        application_id=KEY_PREFIX,
         max_messages=MAX_MESSAGES,
         load_messages=True,
         store_inputs=True,
