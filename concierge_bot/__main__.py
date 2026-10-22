@@ -62,8 +62,8 @@ def main() -> None:
     container = create_dishka()
     app = web.Application()
     app.add_routes(routes)
-    app.on_startup.append(_on_startup)
-    app.on_shutdown.append(_on_shutdown)
+    app.on_startup.append(_on_startup)  # type: ignore[arg-type]  # dishka inject типизирован под хендлеры роутов, не под сигналы приложения
+    app.on_shutdown.append(_on_shutdown)  # type: ignore[arg-type]  # то же
     setup_dishka(container, app, auto_inject=True)
     web.run_app(app, host="0.0.0.0", port=cfg.port)  # noqa: S104
 
