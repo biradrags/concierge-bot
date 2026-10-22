@@ -42,6 +42,22 @@ async def test_create_booking_survives_notification_failure(dao: MagicMock, fail
 
 
 @pytest.mark.asyncio
+async def test_forum_mirror_still_sent_when_admin_notification_fails(dao: MagicMock) -> None:
+    hotel = make_hotel().model_copy(update={"forum_chat_id": 5})
+    guest = make_guest(hotel.id).model_copy(update={"forum_topic_id": 9})
+    service = make_service(hotel.id)
+    dao.service.get_by_id = AsyncMock(return_value=service)
+    dao.booking.create = AsyncMock(return_value=make_booking(guest.id, service.id))
+    notification, forum = MagicMock(), MagicMock()
+    notification.notify_admin = AsyncMock(side_effect=_forbidden())
+    forum.mirror_booking = AsyncMock()
+
+    await BookingService(dao, notification, forum).create_booking(guest, service.id, hotel, None)
+
+    forum.mirror_booking.assert_awaited_once()
+
+
+@pytest.mark.asyncio
 async def test_status_change_survives_guest_notification_failure(dao: MagicMock) -> None:
     guest = make_guest(uuid4())
     updated = make_booking(guest.id, uuid4(), "confirmed")
@@ -58,7 +74,8 @@ async def test_status_change_survives_guest_notification_failure(dao: MagicMock)
 
 
 @pytest.mark.asyncio
-async def test_repeated_decision_is_noop(dao: MagicMock) -> None:
+@pytest.mark.parametrize("method", ["confirm_booking", "cancel_booking"])
+async def test_decided_booking_is_not_changed_again(dao: MagicMock, method: str) -> None:
     guest = make_guest(uuid4())
     already = make_booking(guest.id, uuid4(), "confirmed").model_copy(update={"guest": guest})
     dao.booking.get_by_id = AsyncMock(return_value=already)
@@ -66,7 +83,7 @@ async def test_repeated_decision_is_noop(dao: MagicMock) -> None:
     notification = MagicMock()
     notification.notify_guest = AsyncMock()
 
-    result = await BookingService(dao, notification, MagicMock()).confirm_booking(already.id)
+    result = await getattr(BookingService(dao, notification, MagicMock()), method)(already.id)
 
     assert result == already  # noqa: S101
     dao.booking.update_status.assert_not_awaited()
