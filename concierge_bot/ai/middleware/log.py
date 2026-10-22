@@ -35,7 +35,9 @@ class LoggingMiddleware(AgentMiddleware):
                 "session_id": ctx.session.session_id if ctx.session else None,
             },
         )
-        instructions = (ctx.agent.default_options or {}).get("instructions")
+        # SupportsAgentRun не объявляет default_options - внешний протокол
+        options = getattr(ctx.agent, "default_options", None) or {}
+        instructions = options.get("instructions")
         if instructions and logger.isEnabledFor(logging.DEBUG):
             logger.debug(
                 "instructions_preview=%s",

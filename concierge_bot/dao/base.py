@@ -42,10 +42,10 @@ class BaseDAO[Model_co: Base]:
         await self.session.delete(obj)
 
     async def _delete_by_id(self, id_: UUID) -> None:
-        await self.session.execute(delete(self.model).where(self.model.id == id_))
+        await self.session.execute(delete(self.model).where(self.model.__table__.c.id == id_))
 
     async def count(self) -> int:
-        result = await self.session.execute(select(func.count(self.model.id)))
+        result = await self.session.execute(select(func.count(self.model.__table__.c.id)))
         return int(result.scalar_one())
 
     async def commit(self) -> None:

@@ -8,7 +8,7 @@ from maxo.enums import TextFormat
 from maxo.integrations.dishka import inject
 from maxo.routing.ctx import Ctx
 from maxo.routing.filters import Command, CommandStart
-from maxo.routing.updates.message_created import MessageCreated
+from maxo.types import MessageCreated
 
 from concierge_bot.dao import HolderDao
 from concierge_bot.dto import GuestDTO
