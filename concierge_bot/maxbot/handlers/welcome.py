@@ -2,7 +2,7 @@ from maxo import Bot as MaxBot
 from maxo import Router
 from maxo.enums import TextFormat
 from maxo.routing.ctx import Ctx
-from maxo.routing.updates.bot_started import BotStarted
+from maxo.types import BotStarted
 
 WELCOME = (
     "<b>Консьерж отеля</b>\n"

@@ -52,10 +52,6 @@ python_version = "3.12"
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = ["unihttp.*"]
-follow_imports = "skip"
-
-[[tool.mypy.overrides]]
 module = ["agent_framework_redis.*"]
 ignore_missing_imports = true
 
