@@ -11,6 +11,8 @@ from concierge_bot.services.booking import BookingService
 
 router = Router(name="booking_callback")
 
+_STATUS_RU = {"confirmed": "подтверждена", "cancelled": "отклонена"}
+
 
 @router.callback_query(F.data.startswith("bk:"))
 async def on_booking_decision(
@@ -35,9 +37,9 @@ async def on_booking_decision(
         return
     try:
         if action == "ok":
-            await booking_service.confirm_booking(booking_id)
+            booking = await booking_service.confirm_booking(booking_id)
         else:
-            await booking_service.cancel_booking(booking_id)
+            booking = await booking_service.cancel_booking(booking_id)
     except ValueError as e:
         await query.answer(str(e), show_alert=True)
         return
@@ -50,7 +52,8 @@ async def on_booking_decision(
         return
     await query.answer("Готово")
     base = message.text or message.caption or ""
-    status_ru = "подтверждена" if action == "ok" else "отклонена"
+    # статус берём из брони: уже решённая раньше бронь не меняется, кнопка могла быть устаревшей
+    status_ru = _STATUS_RU.get(booking.status, booking.status)
     suffix = f"\n\n<b>Статус:</b> {html.escape(status_ru)}"
     try:
         if message.text is not None:

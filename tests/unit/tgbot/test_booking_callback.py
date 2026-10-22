@@ -8,6 +8,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, Chat, InaccessibleMessage, Message
 
 from concierge_bot.tgbot.handlers.booking_callback import on_booking_decision
+from tests.unit.factories import make_booking
 
 
 def _query(message: object) -> MagicMock:
@@ -18,10 +19,11 @@ def _query(message: object) -> MagicMock:
     return query
 
 
-def _service() -> MagicMock:
+def _service(status: str = "confirmed") -> MagicMock:
+    booking = make_booking(uuid4(), uuid4(), status)
     service = MagicMock()
-    service.confirm_booking = AsyncMock()
-    service.cancel_booking = AsyncMock()
+    service.confirm_booking = AsyncMock(return_value=booking)
+    service.cancel_booking = AsyncMock(return_value=booking)
     return service
 
 
@@ -65,6 +67,18 @@ async def test_missing_message_answers_instead_of_silence() -> None:
 
     query.answer.assert_awaited_once()
     service.confirm_booking.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_message_shows_actual_status_of_already_decided_booking() -> None:
+    message = MagicMock(spec=Message)
+    message.text = "Новая бронь"
+    message.caption = None
+    message.edit_text = AsyncMock()
+
+    await on_booking_decision(_query(message), _service("cancelled"), _bot())
+
+    assert "отклонена" in message.edit_text.await_args.args[0]  # noqa: S101
 
 
 @pytest.mark.asyncio
