@@ -1,0 +1,71 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-unit:
+    name: Lint and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Install dependencies
+        run: uv sync --frozen --extra test --extra lint
+
+      - name: Ruff
+        run: uvx ruff@0.16.0 check concierge_bot/ tests/
+
+      - name: Semantic rules (money=Decimal)
+        run: uv run bira-rules-check concierge_bot
+
+      - name: Mypy
+        run: uv run mypy concierge_bot
+
+      - name: Unit tests
+        run: uv run pytest tests/unit/ -v
+
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: concierge_bot
+        ports:
+          # host:5437 == docker-compose; conftest читает его как DEFAULT_TEST_URL
+          - 5437:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d concierge_bot"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Install dependencies
+        run: uv sync --frozen --extra test --extra lint
+
+      - name: Integration tests
+        run: uv run pytest tests/integration/ -v
