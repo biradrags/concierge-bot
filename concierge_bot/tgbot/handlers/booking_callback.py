@@ -16,7 +16,10 @@ async def on_booking_decision(
     query: CallbackQuery,
     booking_service: BookingService,
 ) -> None:
-    if not query.data or not query.message:
+    if not query.data:
+        return
+    if not query.message:
+        await query.answer("Сообщение устарело", show_alert=True)
         return
     parts = query.data.split(":")
     if len(parts) != 3:
@@ -36,11 +39,12 @@ async def on_booking_decision(
     except ValueError as e:
         await query.answer(str(e), show_alert=True)
         return
-    await query.answer("Готово")
     message = query.message
-    # старше 48 ч сообщение приходит как InaccessibleMessage - править его нельзя
+    # старше 48 ч сообщение приходит как InaccessibleMessage: клавиатуру не снять, решение уже применено
     if not isinstance(message, Message):
+        await query.answer("Статус брони обновлён. Сообщение устарело, откройте бронь заново.", show_alert=True)
         return
+    await query.answer("Готово")
     base = message.text or message.caption or ""
     status_ru = "подтверждена" if action == "ok" else "отклонена"
     suffix = f"\n\n<b>Статус:</b> {html.escape(status_ru)}"
