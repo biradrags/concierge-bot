@@ -59,7 +59,7 @@ db-current: ## Current Alembic revision
 ##@ Tests & quality
 
 test: ## Fast tests (excludes integration; use test-integration for Postgres)
-	uv run pytest tests -v
+	uv run pytest tests -v -m "not integration"
 
 test-unit: ## Unit tests only
 	uv run pytest tests/unit -v
