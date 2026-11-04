@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
+from bira_core.db.base import Base
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -16,8 +17,6 @@ from sqlalchemy import (
     true,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from concierge_bot.db.base import Base
 
 
 class Hotel(Base):

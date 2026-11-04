@@ -2,12 +2,12 @@ from logging.config import fileConfig
 
 from alembic import context
 from bira_core.db.alembic import run_migrations
+from bira_core.db.base import Base
 from dotenv import find_dotenv, load_dotenv
 from sqlalchemy.engine import make_url
 
 import concierge_bot.db.models  # noqa: F401
 from concierge_bot.config import get_config
-from concierge_bot.db.base import Base
 
 load_dotenv(find_dotenv())
 config = context.config

@@ -3,6 +3,7 @@ from collections.abc import AsyncIterable
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from bira_core.redis.client import make_redis_client
 from dishka import Provider, Scope, provide
 from redis.asyncio import Redis
 from sqlalchemy.engine import make_url
@@ -53,7 +54,7 @@ class AppProvider(Provider):
 
     @provide
     async def redis(self, config: BaseConfig) -> AsyncIterable[Redis]:
-        client = Redis.from_url(config.redis_url, decode_responses=False)
+        client = make_redis_client(config.redis_url, decode_responses=False)
         yield client
         await client.aclose()
 
