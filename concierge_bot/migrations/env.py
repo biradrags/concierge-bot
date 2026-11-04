@@ -20,5 +20,5 @@ config.set_main_option("sqlalchemy.url", str(cfg.database_url))
 run_migrations(
     config,
     Base.metadata,
-    host=make_url(str(cfg.database_url)).host or "",
+    host=make_url(cfg.database_url).host or "",
 )
