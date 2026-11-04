@@ -1,35 +1,7 @@
-"""Stale-intent хендлеры: после рестарта/деплоя старые inline-кнопки не должны сыпать трейсбеки.
+"""Stale-intent: старые inline-кнопки после рестарта не сыпят трейсбеки (канон dialogs.md)."""
 
-Канон: ~/.claude/rules/dialogs.md -> "Stale-intent (UnknownIntent / OutdatedIntent)".
-"""
+from aiogram import Router
+from bira_core.tgbot.dialogs.errors import register_stale_intent
 
-import logging
-
-from aiogram import Bot, Router
-from aiogram.filters import ExceptionTypeFilter
-from aiogram.types import ErrorEvent
-from aiogram_dialog.api.exceptions import OutdatedIntent, UnknownIntent, UnknownState
-
-logger = logging.getLogger(__name__)
 router = Router(name="errors")
-
-
-@router.errors(ExceptionTypeFilter(UnknownIntent, UnknownState, OutdatedIntent))
-async def on_stale_intent(event: ErrorEvent, bot: Bot) -> bool:
-    cb = event.update.callback_query
-    if cb is None or cb.message is None:
-        return True
-    logger.info(
-        "stale intent: dropping message",
-        extra={"chat_id": cb.message.chat.id, "mid": cb.message.message_id},
-    )
-    try:
-        await bot.delete_message(chat_id=cb.message.chat.id, message_id=cb.message.message_id)
-    except Exception:
-        logger.debug("stale intent: delete_message failed", exc_info=True)
-    try:
-        # Без тоста: пользователь уже видит свежий диалог, alert только путает (канон dialogs.md).
-        await cb.answer()
-    except Exception:
-        logger.debug("stale intent: cb.answer failed", exc_info=True)
-    return True
+register_stale_intent(router)

@@ -5,6 +5,7 @@ from aiogram.fsm.storage.base import BaseStorage, DefaultKeyBuilder
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
 from aiogram_dialog import setup_dialogs
+from bira_core.redis.client import make_redis_client
 from dishka import AsyncContainer, Provider, Scope, provide
 from dishka.integrations.aiogram import setup_dishka
 
@@ -16,7 +17,6 @@ from concierge_bot.tgbot.middlewares import (
     setup_dialog_data_middleware,
     setup_middlewares,
 )
-from concierge_bot.utils.redis_client import make_redis_client
 
 logger = logging.getLogger(__name__)
 
