@@ -1,3 +1,4 @@
+from bira_core.di.db import DbProvider
 from dishka import Provider
 from dishka.integrations.aiogram import AiogramProvider
 
@@ -12,6 +13,8 @@ def get_tgbot_providers() -> list[Provider]:
     return [
         AiogramProvider(),
         AppProvider(),
+        # 20+30 из бюджета bira-db max_connections=150 на весь флот
+        DbProvider(pool_size=20, max_overflow=30),
         AIProvider(),
         TgProvider(),
         RequestProvider(),
@@ -21,6 +24,8 @@ def get_tgbot_providers() -> list[Provider]:
 def get_maxbot_providers() -> list[Provider]:
     return [
         AppProvider(),
+        # 20+30 из бюджета bira-db max_connections=150 на весь флот
+        DbProvider(pool_size=20, max_overflow=30),
         AIProvider(),
         MaxBotProvider(),
         MaxDpProvider(),

@@ -161,7 +161,7 @@ make docker-up
 
 # 3. Настроить окружение
 cp .env.example .env
-# Заполнить TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, DATABASE_URL, REDIS_URL
+# Заполнить TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, DB_* (дефолты под docker-compose), REDIS_URL
 
 # 4. Применить миграции
 make db-upgrade

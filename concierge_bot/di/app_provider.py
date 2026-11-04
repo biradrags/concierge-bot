@@ -3,16 +3,11 @@ from collections.abc import AsyncIterable
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from bira_core.db.settings import dml_dsn
+from bira_core.db.url import DbDsn
 from bira_core.redis.client import make_redis_client
 from dishka import Provider, Scope, provide
 from redis.asyncio import Redis
-from sqlalchemy.engine import make_url
-from sqlalchemy.ext.asyncio import (
-    AsyncEngine,
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
 
 from concierge_bot.config import BaseConfig, get_config
 
@@ -25,32 +20,8 @@ class AppProvider(Provider):
         return get_config()
 
     @provide
-    async def engine(self, config: BaseConfig) -> AsyncIterable[AsyncEngine]:
-        url = make_url(config.database_url)
-        connect_args: dict[str, object] = {}
-        host = (url.host or "").lower()
-        if host.endswith(".flycast") or host.endswith(".internal"):
-            connect_args["ssl"] = False
-        eng = create_async_engine(
-            url,
-            pool_pre_ping=True,
-            pool_size=20,
-            max_overflow=30,
-            pool_timeout=5,
-            connect_args=connect_args,
-        )
-        yield eng
-        await eng.dispose(True)
-
-    @provide
-    def pool(self, engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
-        return async_sessionmaker(
-            bind=engine,
-            class_=AsyncSession,
-            expire_on_commit=False,
-            autoflush=False,
-            autocommit=False,
-        )
+    def dsn(self, config: BaseConfig) -> DbDsn:
+        return dml_dsn(config)
 
     @provide
     async def redis(self, config: BaseConfig) -> AsyncIterable[Redis]:

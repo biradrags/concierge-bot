@@ -237,7 +237,7 @@ dependencies = [
     { name = "aiohttp" },
     { name = "alembic" },
     { name = "asyncpg" },
-    { name = "bira-core", extra = ["db", "redis", "tgbot"] },
+    { name = "bira-core", extra = ["db", "di", "redis", "tgbot"] },
     { name = "dishka" },
     { name = "greenlet" },
     { name = "maxo", extra = ["dishka"] },
@@ -271,7 +271,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.9.5,<4.0" },
     { name = "alembic", specifier = ">=1.13.3,<2.0" },
     { name = "asyncpg", specifier = ">=0.29.0,<0.30.0" },
-    { name = "bira-core", extras = ["db", "redis", "tgbot"], git = "https://github.com/biradrags/bira-core?rev=v0.6.4" },
+    { name = "bira-core", extras = ["db", "di", "redis", "tgbot"], git = "https://github.com/biradrags/bira-core?rev=v0.6.5" },
     { name = "dishka", specifier = ">=1.10.1,<2.0" },
     { name = "greenlet", specifier = ">=3.2.0,<4.0" },
     { name = "maxo", extras = ["dishka"], specifier = ">=0.9.0,<1.0" },
@@ -292,8 +292,8 @@ provides-extras = ["test", "lint"]
 
 [[package]]
 name = "bira-core"
-version = "0.6.4"
-source = { git = "https://github.com/biradrags/bira-core?rev=v0.6.4#67010369382cd853f3516c2e57041a7d2b56ef91" }
+version = "0.6.5"
+source = { git = "https://github.com/biradrags/bira-core?rev=v0.6.5#acca66e99ced8bbc914f2282ede2f2aa0acadef7" }
 dependencies = [
     { name = "aiohttp" },
 ]
@@ -304,6 +304,9 @@ db = [
     { name = "asyncpg" },
     { name = "pydantic" },
     { name = "sqlalchemy", extra = ["asyncio"] },
+]
+di = [
+    { name = "dishka" },
 ]
 redis = [
     { name = "redis" },

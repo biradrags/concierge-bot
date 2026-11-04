@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import os
 
+from bira_core.db.settings import dml_dsn
+from bira_core.db.url import build_url
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from concierge_bot.config import get_config
@@ -14,7 +16,7 @@ from concierge_bot.dao import HolderDao
 async def main() -> None:
     os.environ.setdefault("APP_ENV", "development")
     cfg = get_config()
-    engine = create_async_engine(cfg.database_url)
+    engine = create_async_engine(build_url(dml_dsn(cfg)))
     factory = async_sessionmaker(engine, expire_on_commit=False)
     async with factory() as session:
         holder = HolderDao(session)
