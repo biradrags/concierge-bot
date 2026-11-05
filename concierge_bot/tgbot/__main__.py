@@ -3,9 +3,9 @@ import logging
 import sys
 
 from aiogram import Bot, Dispatcher
+from bira_core.log.setup import setup_logging
 
 from concierge_bot.config import get_config
-from concierge_bot.log import setup_logging
 from concierge_bot.main_factory import create_dishka
 from concierge_bot.tgbot.main_factory import resolve_update_types
 

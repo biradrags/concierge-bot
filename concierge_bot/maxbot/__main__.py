@@ -4,12 +4,12 @@ import asyncio
 import logging
 import sys
 
+from bira_core.log.setup import setup_logging
 from maxo import Bot as MaxBot
 from maxo import Dispatcher as MaxDispatcher
 from maxo.transport.long_polling import LongPolling
 
 from concierge_bot.config import get_config
-from concierge_bot.log import setup_logging
 from concierge_bot.maxbot.main_factory import create_max_dishka
 
 logger = logging.getLogger(__name__)

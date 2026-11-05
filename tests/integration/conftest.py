@@ -2,12 +2,12 @@ import os
 
 import pytest
 import pytest_asyncio
+from bira_core.db.base import Base
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
 from concierge_bot.dao import HolderDao
-from concierge_bot.db.base import Base
 
 DEFAULT_TEST_URL = (
     "postgresql+asyncpg://postgres:postgres@127.0.0.1:5437/concierge_bot"

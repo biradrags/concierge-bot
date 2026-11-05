@@ -3,10 +3,10 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
 from aiohttp import web
+from bira_core.log.setup import setup_logging
 from dishka.integrations.aiohttp import FromDishka, inject, setup_dishka
 
 from concierge_bot.config import BaseConfig, get_config
-from concierge_bot.log import setup_logging
 from concierge_bot.main_factory import create_dishka
 from concierge_bot.tgbot.main_factory import resolve_update_types
 

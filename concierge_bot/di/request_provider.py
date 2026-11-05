@@ -1,9 +1,7 @@
-from collections.abc import AsyncIterable
-
 from agent_framework.openai import OpenAIChatClient
 from aiogram import Bot
 from dishka import Provider, Scope, provide
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from concierge_bot.ai.history import ConciergeRedisHistoryProvider
 from concierge_bot.config import BaseConfig
@@ -16,14 +14,6 @@ from concierge_bot.services.notification import NotificationService
 
 
 class RequestProvider(Provider):
-    @provide(scope=Scope.REQUEST)
-    async def session(
-        self,
-        pool: async_sessionmaker[AsyncSession],
-    ) -> AsyncIterable[AsyncSession]:
-        async with pool() as sess:
-            yield sess
-
     @provide(scope=Scope.REQUEST)
     def dao(self, session: AsyncSession) -> HolderDao:
         return HolderDao(session)

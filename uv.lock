@@ -237,7 +237,7 @@ dependencies = [
     { name = "aiohttp" },
     { name = "alembic" },
     { name = "asyncpg" },
-    { name = "bira-core" },
+    { name = "bira-core", extra = ["db", "di", "redis", "tgbot"] },
     { name = "dishka" },
     { name = "greenlet" },
     { name = "maxo", extra = ["dishka"] },
@@ -271,7 +271,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.9.5,<4.0" },
     { name = "alembic", specifier = ">=1.13.3,<2.0" },
     { name = "asyncpg", specifier = ">=0.29.0,<0.30.0" },
-    { name = "bira-core", git = "https://github.com/biradrags/bira-core?rev=v0.6.4" },
+    { name = "bira-core", extras = ["db", "di", "redis", "tgbot"], git = "https://github.com/biradrags/bira-core?rev=v0.6.5" },
     { name = "dishka", specifier = ">=1.10.1,<2.0" },
     { name = "greenlet", specifier = ">=3.2.0,<4.0" },
     { name = "maxo", extras = ["dishka"], specifier = ">=0.9.0,<1.0" },
@@ -292,10 +292,28 @@ provides-extras = ["test", "lint"]
 
 [[package]]
 name = "bira-core"
-version = "0.6.4"
-source = { git = "https://github.com/biradrags/bira-core?rev=v0.6.4#67010369382cd853f3516c2e57041a7d2b56ef91" }
+version = "0.6.5"
+source = { git = "https://github.com/biradrags/bira-core?rev=v0.6.5#acca66e99ced8bbc914f2282ede2f2aa0acadef7" }
 dependencies = [
     { name = "aiohttp" },
+]
+
+[package.optional-dependencies]
+db = [
+    { name = "alembic" },
+    { name = "asyncpg" },
+    { name = "pydantic" },
+    { name = "sqlalchemy", extra = ["asyncio"] },
+]
+di = [
+    { name = "dishka" },
+]
+redis = [
+    { name = "redis" },
+]
+tgbot = [
+    { name = "aiogram" },
+    { name = "aiogram-dialog" },
 ]
 
 [[package]]
@@ -1081,6 +1099,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/fd/3c/a09912dce2bb0bf10dab3f4bf1b851822528a9e4d0a3eadfb7828bb6dab8/sqlalchemy-2.0.55-cp312-cp312-win32.whl", hash = "sha256:4ff08c8c2f701d2bcbe731833bfbb96195e3ce7a0e400e8b699f8e4a0020545f", size = 2148215, upload-time = "2026-10-16T21:13:17.716Z" },
     { url = "https://files.pythonhosted.org/packages/19/10/0ec446c9ee7467f869c298e12a3c5ec0f47a6cd64b2b59764ab6f1287017/sqlalchemy-2.0.55-cp312-cp312-win_amd64.whl", hash = "sha256:a13820f47eda53d603f56feaadeab9787d0110b7fcbe6ab2ff2415bd3ea31c79", size = 2177392, upload-time = "2026-10-16T21:13:19.22Z" },
     { url = "https://files.pythonhosted.org/packages/fd/91/de9283ed03f777daaf2a65823dfa9900bd0859dc0b1d3d314898536cfc08/sqlalchemy-2.0.55-py3-none-any.whl", hash = "sha256:d2954796165c08e2f70082e4577a4c3ce6f141c77e2e4b378b3b528653b54311", size = 1965364, upload-time = "2026-10-16T20:49:56.266Z" },
+]
+
+[package.optional-dependencies]
+asyncio = [
+    { name = "greenlet" },
 ]
 
 [[package]]

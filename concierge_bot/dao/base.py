@@ -1,11 +1,10 @@
 from collections.abc import Sequence
 from uuid import UUID
 
+from bira_core.db.base import Base
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.interfaces import ORMOption
-
-from concierge_bot.db.base import Base
 
 
 class BaseDAO[Model_co: Base]:
