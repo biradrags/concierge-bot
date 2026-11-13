@@ -10,7 +10,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "aiogram>=3.31.0,<4.0",
     "aiogram-dialog>=2.5.0,<3.0",
-    "asyncpg>=0.29.0,<0.30.0",
+    "asyncpg>=0.29.0,<0.33.0",
     "alembic>=1.13.3,<2.0",
     "psycopg>=3.2.3,<4.0",
     "psycopg-binary>=3.2.3,<4.0",
@@ -23,8 +23,8 @@ dependencies = [
     "greenlet>=3.2.0,<4.0",
     "redis>=6.0.0,<7.0.0",
     "maxo[dishka]>=0.9.0,<1.0",
-    "agent-framework-core>=1.22.0,<1.23",
-    "agent-framework-openai>=1.17.0,<1.18",
+    "agent-framework-core>=1.22.0,<1.26",
+    "agent-framework-openai>=1.17.0,<1.19",
     "agent-framework-redis>=1.0.0b261015,<2.0",
     "bira-core[db,di,redis,tgbot] @ git+https://github.com/biradrags/bira-core@v0.6.5",
 ]
@@ -32,12 +32,12 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest>=8.3.5,<9.0",
-    "pytest-asyncio>=0.26.0,<0.27.0",
-    "pytest-cov>=4.1.0,<5.0",
+    "pytest-asyncio>=0.26.0,<1.5.0",
+    "pytest-cov>=4.1.0,<8.0",
 ]
 lint = [
-    "ruff>=0.16,<0.17",
-    "mypy>=1.13.0,<2.0",
+    "ruff>=0.16,<0.18",
+    "mypy>=1.13.0,<3.0",
 ]
 
 [tool.setuptools.packages.find]
