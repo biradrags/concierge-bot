@@ -1,4 +1,4 @@
-FROM python:3.12 as builder
+FROM python:3.13 as builder
 WORKDIR /app
 COPY pyproject.toml .
 COPY bali_concierge bali_concierge
@@ -7,7 +7,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install --no-cache-dir -e .
 
-FROM python:3.12-slim
+FROM python:3.15-slim
 WORKDIR /app
 ENV VIRTUAL_ENV=/opt/venv
 COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
