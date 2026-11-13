@@ -21,6 +21,9 @@ updates:
       docker-security:
         applies-to: security-updates
         patterns: ["*"]
+    ignore:
+      - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
